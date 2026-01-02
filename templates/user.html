@@ -1,0 +1,3214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MahaPass - User Dashboard</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logobus1.png') }}">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --msrtc-red: #D40000;
+      --msrtc-dark-red: #8B0000;
+      --msrtc-yellow: #FFD700;
+      --msrtc-black: #222222;
+      --msrtc-light: #FFF5F5;
+      --sidebar-width: 280px;
+      --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      overflow-x: hidden;
+      color: var(--msrtc-black);
+      padding-top: 70px;
+      /* Added for fixed navbar */
+    }
+
+    /* Navbar with logo */
+    .navbar {
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red)) !important;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1030;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s ease;
+      min-height: 70px;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--msrtc-yellow);
+    }
+
+    .navbar.scrolled {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000) !important;
+      min-height: 60px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-brand {
+      padding: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand img {
+      height: 140px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 6px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .navbar.scrolled .navbar-brand img {
+      height: 100px;
+    }
+
+    .navbar-nav .nav-link {
+      color: #ffeaea !important;
+      font-weight: 500;
+      padding: 12px 18px;
+      margin: 0 5px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: var(--msrtc-yellow);
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:hover:before,
+    .navbar-nav .nav-link.fw-bold:before {
+      width: 80%;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.fw-bold {
+      color: #ffffff !important;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-light {
+      color: #fff;
+      border: 2px solid #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: var(--transition);
+      border-radius: 8px;
+      padding: 8px 20px;
+    }
+
+    .btn-outline-light:hover {
+      background-color: #fff;
+      color: var(--msrtc-red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: white;
+      position: relative;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+      background: var(--msrtc-light);
+    }
+
+    .profile-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-menu {
+      padding: 15px 0;
+    }
+
+    .sidebar-menu .menu-item {
+      padding: 12px 20px;
+      color: var(--msrtc-black);
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+      margin: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .sidebar-menu .menu-item:hover,
+    .sidebar-menu .menu-item.active {
+      background: var(--msrtc-light);
+      color: var(--msrtc-red);
+      border-left: 3px solid var(--msrtc-red);
+      transform: translateX(5px);
+    }
+
+    .sidebar-menu .menu-item i {
+      margin-right: 10px;
+      width: 24px;
+      text-align: center;
+      color: var(--msrtc-red);
+    }
+
+    .sidebar-menu .menu-item.active i {
+      color: var(--msrtc-red);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 0;
+      padding: 25px;
+      transition: var(--transition);
+      min-height: calc(100vh - 70px);
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-value {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--msrtc-red);
+      line-height: 1;
+      margin: 10px 0;
+    }
+
+    .card-label {
+      color: #666;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* Status Badges */
+    .badge-pending {
+      background-color: var(--warning-color);
+      color: white;
+    }
+
+    .badge-approved {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .badge-rejected {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .badge-expired {
+      background-color: #7f8c8d;
+      color: white;
+    }
+
+    /* Application Form */
+    .form-section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .progress-steps:before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #eee;
+      z-index: 1;
+      border-radius: 3px;
+    }
+
+    .progress-step {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 100%;
+    }
+
+    .progress-step .step-number {
+      width: 35px;
+      height: 35px;
+      background: #ddd;
+      color: #666;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 5px;
+      font-weight: bold;
+      transition: var(--transition);
+      border: 3px solid white;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-step.active .step-number {
+      background: var(--msrtc-red);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .progress-step.completed .step-number {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .progress-step .step-label {
+      font-size: 0.85rem;
+      color: #666;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .progress-step.active .step-label,
+    .progress-step.completed .step-label {
+      color: var(--msrtc-black);
+      font-weight: 600;
+    }
+
+    /* ID Card */
+    .id-card {
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
+      border-radius: 15px;
+      border: 2px solid var(--msrtc-yellow);
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .id-card:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23D40000" opacity="0.05"><text x="0" y="50" font-family="Arial" font-size="20" transform="rotate(-45)">MSRTC OFFICIAL</text></svg>');
+      background-repeat: repeat;
+    }
+
+    /* QR Code */
+    .qr-code {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #eee;
+    }
+
+    /* Buttons */
+    .btn-msrtc {
+      background: var(--msrtc-red);
+      color: white;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 8px;
+      border: none;
+      transition: var(--transition);
+      box-shadow: 0 4px 8px rgba(212, 0, 0, 0.2);
+    }
+
+    .btn-msrtc:hover {
+      background: var(--msrtc-dark-red);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(212, 0, 0, 0.3);
+    }
+
+    .btn-msrtc-outline {
+      background: transparent;
+      color: var(--msrtc-red);
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 8px;
+      border: 2px solid var(--msrtc-red);
+      transition: var(--transition);
+    }
+
+    .btn-msrtc-outline:hover {
+      background: var(--msrtc-red);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000);
+      color: white;
+      padding: 30px 0;
+      margin-left: 0;
+      transition: var(--transition);
+    }
+
+    .footer a {
+      color: var(--msrtc-yellow);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .social-icons a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .social-icons a:hover {
+      background: var(--msrtc-yellow);
+      color: var(--msrtc-red);
+      transform: translateY(-3px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .footer {
+        margin-left: 0;
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        height: calc(100vh - 70px);
+        z-index: 1040;
+        width: var(--sidebar-width);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+        background: #fff;
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1035;
+        display: none;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .slide-up {
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--msrtc-red);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--msrtc-dark-red);
+    }
+
+    /* Table Styling */
+    .table-custom {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+
+    .table-custom thead th {
+      background: var(--msrtc-red);
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      position: sticky;
+      top: 0;
+    }
+
+    .table-custom tbody tr {
+      transition: var(--transition);
+    }
+
+    .table-custom tbody tr:hover {
+      background: var(--msrtc-light);
+      transform: translateX(5px);
+    }
+
+    .table-custom tbody td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    /* Tab Styling */
+    .nav-tabs-custom .nav-link {
+      color: var(--msrtc-black);
+      font-weight: 500;
+      border: none;
+      padding: 12px 20px;
+      position: relative;
+    }
+
+    .nav-tabs-custom .nav-link.active {
+      color: var(--msrtc-red);
+      background: transparent;
+    }
+
+    .nav-tabs-custom .nav-link.active:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--msrtc-red);
+    }
+
+    .nav-tabs-custom .nav-link:hover:not(.active) {
+      color: var(--msrtc-red);
+    }
+
+    /* Content sections */
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    /* Quick Actions Styles */
+    .quick-actions-section {
+      margin-top: 2rem;
+    }
+
+    .quick-actions-section .dashboard-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quick-action-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .quick-action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--msrtc-red);
+    }
+
+    .action-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .quick-action-card:hover .action-icon {
+      transform: scale(1.05);
+    }
+
+    .action-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .action-title {
+      font-weight: 600;
+      color: var(--msrtc-black);
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .action-desc {
+      color: #666;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+
+
+    .action-arrow {
+      color: #ccc;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .quick-action-card:hover .action-arrow {
+      color: var(--msrtc-red);
+      transform: translateX(4px);
+    }
+
+    /* Color schemes for action icons */
+    .action-icon.bg-primary {
+      background: #007bff;
+    }
+
+    .action-icon.bg-warning {
+      background: #ffc107;
+    }
+
+    .action-icon.bg-info {
+      background: #17a2b8;
+    }
+
+    .action-icon.bg-success {
+      background: #28a745;
+    }
+
+    /* Responsive adjustments for quick actions */
+    @media (max-width: 768px) {
+      .quick-action-card {
+        padding: 1rem;
+        gap: 0.75rem;
+      }
+
+      .action-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+      }
+
+      .action-title {
+        font-size: 0.9rem;
+      }
+
+      .action-desc {
+        font-size: 0.8rem;
+      }
+    }
+
+    .dashboard-layout {
+      display: flex;
+      min-height: calc(100vh - 70px - 90px);
+      /* 70px navbar, 90px footer (adjust as needed) */
+    }
+
+    /* Flash Messages */
+    .flash-messages {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1050;
+      max-width: 400px;
+    }
+
+    .flash-message {
+      margin-bottom: 10px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideInRight 0.5s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flash-message.success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+
+    .flash-message.danger {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+
+    .flash-message.info {
+      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .flash-message.warning {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+
+    .flash-message .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .flash-message .close-btn:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 0;
+      padding: 25px;
+      min-width: 0;
+    }
+
+    .footer {
+      margin-left: 0;
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .footer {
+        margin-left: 0;
+      }
+    }
+/* Notification dropdown styles */
+.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  white-space: normal;
+}
+
+/* Modal styles */
+.modal-content {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background-color: var(--msrtc-light);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Rating stars */
+.form-check-inline {
+  margin-right: 0.5rem;
+}
+
+/* FAQ accordion */
+.accordion-button:not(.collapsed) {
+  background-color: var(--msrtc-light);
+  color: var(--msrtc-red);
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, 0.125);
+}
+/* Style for unread notifications */
+.unread-notification {
+  background-color: rgba(212, 0, 0, 0.05) !important;
+  border-left: 3px solid var(--msrtc-red);
+}
+
+.unread-notification:hover {
+  background-color: rgba(212, 0, 0, 0.1) !important;
+}
+
+@media (max-width: 992px) {
+  .navbar .navbar-toggler { display: none !important; }
+  .navbar #sidebarToggle { display: inline-flex; align-items: center; }
+  .navbar .navbar-collapse { display: none !important; }
+}
+
+@media (min-width: 993px) {
+  .navbar #sidebarToggle { display: none !important; }
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- Flash Messages -->
+  <div class="flash-messages" id="flashMessages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="closeFlashMessage(this)">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="{{ url_for('static', filename='images/logobus1.png') }}" alt="Smart Bus Pass Logo" />
+    </a>
+
+    <button id="sidebarToggle" class="btn btn-outline-light ms-2">
+      <i class="fas fa-bars me-1"></i> Menu
+    </button>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link fw-bold" href="#" data-section="dashboard" onclick="showSection('dashboard')">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-section="my-pass" onclick="showSection('my-pass')">My Pass</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-section="new-application" onclick="showSection('new-application')">New Application</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-section="application-status" onclick="showSection('application-status')">Check Status</a>
+        </li>
+        
+      </ul>
+
+      <div class="d-flex">
+        <a class="btn btn-outline-light me-2" href="{{ url_for('logout') }}">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
+      </div>
+        
+        <!-- Help Dropdown -->
+        <div class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" id="helpDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-question-circle"></i> Help
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="helpDropdown">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#faqModal"><i class="fas fa-question me-2"></i> FAQs</a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#contactModal"><i class="fas fa-envelope me-2"></i> Contact Support</a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#feedbackModal"><i class="fas fa-comment me-2"></i> Give Feedback</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal"><i class="fas fa-info-circle me-2"></i> About MahaPass</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Dashboard Layout: Sidebar + Main Content -->
+  <div class="dashboard-layout d-flex">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="profile-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <h5 class="text-center mt-2">{{ user.full_name }}</h5>
+        <p class="text-muted text-center small">Student ID: {{ user.college_id or (applications[0].student_id if applications and applications[0].student_id else 'Not set') }}</p>
+      </div>
+
+      <div class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" data-section="dashboard">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="#my-pass" class="menu-item" data-section="my-pass">
+          <i class="fas fa-id-card"></i> My Pass
+        </a>
+
+        <a href="#new-application" class="menu-item" data-section="new-application">
+          <i class="fas fa-file-alt"></i> New Application
+        </a>
+
+        <a href="#renew-pass" class="menu-item" data-section="renew-pass">
+          <i class="fas fa-sync-alt"></i> Renew Pass
+        </a>
+
+        <a href="#application-status" class="menu-item" data-section="application-status">
+          <i class="fas fa-search"></i> Check Status
+        </a>
+
+        <a href="#history" class="menu-item" data-section="history">
+          <i class="fas fa-history"></i> History
+        </a>
+
+        <a href="#settings" class="menu-item" data-section="settings">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="container-fluid">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+
+
+          <!-- SVG Background Pattern -->
+          <div style="position: absolute; top: 80px; right: 0; z-index: 0; opacity: 0.08; pointer-events: none;">
+            <svg width="320" height="180">
+              <circle cx="160" cy="90" r="80" fill="#D40000" />
+            </svg>
+          </div>
+
+          <!-- Overview Heading -->
+          <h4 class="mb-3 mt-2 fw-semibold" style="z-index:1; position:relative;">Your Overview</h4>
+
+          <!-- Hero Section with Background Image and Overlay -->
+           
+          <div class="dashboard-hero-img position-relative mb-4 rounded-4 overflow-hidden" style="height: 180px;">
+            <img src="{{ url_for('static', filename='images/dashboard2.png') }}" alt="Hero"
+              style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7);">
+            <div
+              class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-start ps-5"
+              style="z-index:2;">
+              <h1 class="text-white fw-bold mb-2" style="text-shadow:0 2px 8px #0008;">Welcome, {{ user.full_name }}!
+              </h1>
+              <div class="text-white fs-5" style="text-shadow:0 1px 4px #0007;">Your MSRTC MahaPass dashboard</div>
+            </div>
+          </div>
+
+          <!-- Dark Mode Toggle -->
+          <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-outline-dark" id="darkModeToggle"><i class="fas fa-moon me-2"></i>Dark Mode</button>
+          </div>
+
+          <!-- Main Dashboard Cards with Animated Counters -->
+<div class="row g-4 position-relative" style="z-index:1;">
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="dashboard-card glass-card text-center p-4 h-100 animate__animated animate__fadeInUp">
+      <div class="mb-2"><i class="fas fa-id-card fa-2x text-danger"></i></div>
+      <div class="card-value animated-counter" data-target="{{ active_passes }}">0</div>
+      <div class="card-label">Active Passes</div>
+      <div class="mt-2 text-success small">
+        {% if active_passes > 0 %}
+          <i class="fas fa-check-circle me-1"></i> Valid pass
+        {% else %}
+          <i class="fas fa-exclamation-circle me-1"></i> No active pass
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="dashboard-card glass-card text-center p-4 h-100 animate__animated animate__fadeInUp"
+      style="animation-delay:0.1s;">
+      <div class="mb-2"><i class="fas fa-hourglass-half fa-2x text-warning"></i></div>
+      <div class="card-value animated-counter" data-target="{{ days_remaining }}">0</div>
+      <div class="card-label">Days Remaining</div>
+      <div class="mt-2 small">
+        {% if days_remaining > 30 %}
+          <span class="text-success"><i class="fas fa-check-circle me-1"></i> Valid</span>
+        {% elif days_remaining > 7 %}
+          <span class="text-warning"><i class="fas fa-clock me-1"></i> Expiring soon</span>
+        {% elif days_remaining > 0 %}
+          <span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> About to expire</span>
+        {% else %}
+          <span class="text-secondary"><i class="fas fa-times-circle me-1"></i> Expired</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="dashboard-card glass-card text-center p-4 h-100 animate__animated animate__fadeInUp"
+      style="animation-delay:0.2s;">
+      <div class="mb-2"><i class="fas fa-tasks fa-2x text-info"></i></div>
+      <div class="card-value animated-counter" data-target="{{ pending_applications }}">0</div>
+      <div class="card-label">Pending Applications</div>
+      <div class="mt-2 text-info small">
+        {% if pending_applications > 0 %}
+          <i class="fas fa-spinner me-1"></i> In Process
+        {% else %}
+          <i class="fas fa-check me-1"></i> All processed
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="dashboard-card glass-card text-center p-4 h-100 animate__animated animate__fadeInUp"
+      style="animation-delay:0.3s;">
+      <div class="mb-2"><i class="fas fa-history fa-2x text-primary"></i></div>
+      <div class="card-value animated-counter" data-target="{{ total_applications }}">0</div>
+      <div class="card-label">Total Applications</div>
+      <div class="mt-2 text-primary small">
+        <i class="fas fa-archive me-1"></i> History
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function markAllAsRead() {
+  fetch('/mark_notifications_read', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Hide all notifications and badge
+      document.querySelectorAll('.dropdown-menu[aria-labelledby="notificationDropdown"] li').forEach(function(li) {
+        if (!li.querySelector('.dropdown-header') && !li.querySelector('.dropdown-item.text-center.small')) {
+          li.style.display = 'none';
+        }
+      });
+      var badge = document.querySelector('#notificationDropdown .badge, #notificationDropdown .notification-badge');
+      if (badge) badge.style.display = 'none';
+      // Optionally show 'No notifications' message
+      var menu = document.querySelector('.dropdown-menu[aria-labelledby="notificationDropdown"]');
+      if (menu) {
+        var noNotif = document.createElement('li');
+        noNotif.innerHTML = '<a class="dropdown-item text-center text-muted" href="#">No notifications</a>';
+        menu.insertBefore(noNotif, menu.querySelector('.dropdown-item.text-center.small'));
+      }
+    }
+  });
+}
+</script>
+
+          <!-- Quick Actions Section -->
+          <div class="quick-actions-section mb-4">
+            <div class="dashboard-card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0"><i class="fas fa-bolt text-primary me-2"></i>Quick Actions</h5>
+                <span class="badge bg-primary">Most Used</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                  <div class="quick-action-card" onclick="showSection('new-application')">
+                    <div class="action-icon bg-primary">
+                      <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-content">
+                      <h6 class="action-title">New Application</h6>
+                      <p class="action-desc">Apply for a new bus pass</p>
+                    </div>
+                    <div class="action-arrow">
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                  <div class="quick-action-card" onclick="showSection('renew-pass')">
+                    <div class="action-icon bg-warning">
+                      <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="action-content">
+                      <h6 class="action-title">Renew Pass</h6>
+                      <p class="action-desc">Extend your current pass</p>
+                    </div>
+                    <div class="action-arrow">
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                  <div class="quick-action-card" onclick="showSection('application-status')">
+                    <div class="action-icon bg-info">
+                      <i class="fas fa-search"></i>
+                    </div>
+                    <div class="action-content">
+                      <h6 class="action-title">Check Status</h6>
+                      <p class="action-desc">Track application progress</p>
+                    </div>
+                    <div class="action-arrow">
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                  <div class="quick-action-card" onclick="showSection('my-pass')">
+                    <div class="action-icon bg-success">
+                      <i class="fas fa-download"></i>
+                    </div>
+                    <div class="action-content">
+                      <h6 class="action-title">Download Pass</h6>
+                      <p class="action-desc">Get your digital pass</p>
+                    </div>
+                    <div class="action-arrow">
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Widget, Achievements, Testimonial Carousel -->
+          <div class="row g-4 mt-4">
+            <!-- Bus Schedule -->
+           
+            <!-- Pass Fee Calculator -->
+            <div class="col-md-4">
+              <div class="dashboard-card glass-card h-100">
+                <h6 class="mb-3"><i class="fas fa-calculator text-primary me-2"></i>Pass Fee Calculator</h6>
+                <form id="feeCalculatorForm">
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Starting Point</label>
+                    <input class="form-control form-control-sm" id="startPointCalc" list="calcStops" placeholder="Type or choose a stop in Ratnagiri" required />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Destination Point</label>
+                    <input class="form-control form-control-sm" id="endPointCalc" list="calcStops" placeholder="Type or choose a stop in Ratnagiri" required />
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm w-100 mb-3" onclick="calculateFee()">
+                    <i class="fas fa-calculator me-1"></i> Calculate Fee
+                  </button>
+                  <div id="feeResult" class="text-center" style="display: none;">
+                    <div class="alert alert-info mb-2 text-start">
+                      <div class="small text-muted">Distance</div>
+                      <div class="fw-semibold"><span id="calculatedDistance">0</span> km</div>
+                      <hr class="my-2">
+                      <div class="small text-muted">Normal Fare (per trip)</div>
+                      <div class="fs-6 fw-bold text-primary">₹<span id="normalPerTrip">0</span></div>
+                      <div class="small text-muted">Student Fare (per trip, 33.33%)</div>
+                      <div class="fs-6 fw-bold text-success">₹<span id="studentPerTrip">0</span></div>
+                      <div class="small text-muted">Student Monthly Pass (60 trips)</div>
+                      <div class="fs-5 fw-bold text-danger">₹<span id="studentMonthly">0</span></div>
+                    </div>
+                    <div class="small text-muted">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Calculation uses ₹1.25/km and 60 trips/month. Route limited to Karbude Phata → Ratnagiri Bus Stand.
+                    </div>
+                  </div>
+                </form>
+                <!-- Allowed stops for this route -->
+                <datalist id="calcStops">
+                  <option value="Karbude Phata"></option>
+                  <option value="Masebav"></option>
+                  <option value="Nivali"></option>
+                  <option value="Hathkhamba"></option>
+                  <option value="Panaval"></option>
+                  <option value="Khedshi"></option>
+                  <option value="Mahalakshmi Mandir"></option>
+                  <option value="Karawanchiwadi"></option>
+                  <option value="Railway Station"></option>
+                  <option value="Kuvarbav"></option>
+                  <option value="Dmart"></option>
+                  <option value="TRP"></option>
+                  <option value="JK File"></option>
+                  <option value="Shivaji Nagar"></option>
+                  <option value="Maruti Mandir"></option>
+                  <option value="Ratnagiri Bus Stand"></option>
+                </datalist>
+              </div>
+            </div>
+
+          </div>
+
+          
+
+          <script>
+            // Animated Counters
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.animated-counter').forEach(function (counter) {
+    const target = parseInt(counter.getAttribute('data-target'));
+    let count = 0;
+    const increment = Math.ceil(target / 60);
+    
+    function updateCounter() {
+      count += increment;
+      if (count > target) count = target;
+      counter.textContent = count.toLocaleString();
+      if (count < target) requestAnimationFrame(updateCounter);
+    }
+    
+    // Only animate if the target is greater than 0
+    if (target > 0) {
+      updateCounter();
+    } else {
+      counter.textContent = "0";
+    }
+  });
+});
+            // Dark Mode Toggle
+            document.getElementById('darkModeToggle').addEventListener('click', function () {
+              document.body.classList.toggle('dark-mode');
+            });
+          </script>
+          <style>
+            .dashboard-hero-img img {
+              filter: brightness(0.7);
+            }
+
+            .dark-mode {
+              background: #181818 !important;
+              color: #f1f1f1 !important;
+            }
+
+            .dark-mode .dashboard-card,
+            .dark-mode .glass-card {
+              background: rgba(34, 34, 34, 0.95) !important;
+              color: #f1f1f1 !important;
+            }
+
+            .dark-mode .navbar,
+            .dark-mode .footer {
+              background: #222 !important;
+              color: #fff !important;
+            }
+
+            .dark-mode .table-custom thead th {
+              background: #333 !important;
+              color: #FFD700 !important;
+            }
+
+            .dark-mode .btn-outline-dark {
+              color: #FFD700;
+              border-color: #FFD700;
+            }
+
+            .dark-mode .btn-outline-dark:hover {
+              background: #FFD700;
+              color: #222;
+            }
+          </style>
+
+          <script>
+            // ---- Dynamic Stops + Real Distance Fee Calculator (OSRM) ----
+            const STOP_CACHE = [];
+            const STOP_LOOKUP = {}; // lower(name) -> { id, name, city, district }
+
+            async function loadStops() {
+              try {
+                const res = await fetch('/api/stops?limit=500', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (!data.success) return;
+                STOP_CACHE.length = 0;
+                const dl = document.getElementById('ratnagiriStops');
+                if (dl) dl.innerHTML = '';
+                data.stops.forEach(s => {
+                  STOP_CACHE.push(s);
+                  const key = String(s.name).trim().toLowerCase();
+                  STOP_LOOKUP[key] = s;
+                  if (dl) {
+                    const opt = document.createElement('option');
+                    opt.value = s.name;
+                    dl.appendChild(opt);
+                  }
+                });
+              } catch (e) {
+                console.warn('Failed to load stops', e);
+              }
+            }
+
+            function resolveStopIdByName(name) {
+              if (!name) return null;
+              const key = String(name).trim().toLowerCase();
+              if (STOP_LOOKUP[key]) return STOP_LOOKUP[key].id;
+              // Fallback: try startsWith or includes
+              const match = STOP_CACHE.find(s => s.name.toLowerCase() === key) ||
+                            STOP_CACHE.find(s => s.name.toLowerCase().startsWith(key)) ||
+                            STOP_CACHE.find(s => key.includes(s.name.toLowerCase()));
+              return match ? match.id : null;
+            }
+
+            async function calculateFee() {
+              const startVal = document.getElementById('startPointCalc').value;
+              const endVal = document.getElementById('endPointCalc').value;
+              const passType = document.getElementById('passTypeCalc').value; // student, regular, senior, disabled
+              const durationMonths = parseInt(document.getElementById('durationCalc').value || '0', 10);
+
+              const fromId = resolveStopIdByName(startVal);
+              const toId = resolveStopIdByName(endVal);
+
+              if (!fromId || !toId) {
+                alert('Please select valid Maharashtra stops for both Start and Destination.');
+                return;
+              }
+              if (fromId === toId) {
+                alert('Starting point and destination cannot be the same.');
+                return;
+              }
+              if (!passType || !durationMonths) {
+                alert('Please select pass type and duration.');
+                return;
+              }
+
+              try {
+                const res = await fetch('/api/calculate_fee', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'same-origin',
+                  body: JSON.stringify({ from_stop_id: fromId, to_stop_id: toId, pass_type: passType, months: durationMonths })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                  alert(data.message || 'Failed to calculate fee');
+                  return;
+                }
+                const totalFee = data.total_fee || 0;
+                const distanceKm = data.distance_km || 0;
+                const base = data.breakdown?.base_monthly_per_km ?? 0;
+                const mult = data.breakdown?.type_multiplier ?? 1;
+
+                document.getElementById('calculatedFee').textContent = Number(totalFee).toLocaleString('en-IN');
+                const breakdown = `Distance: ${distanceKm} km • Base ₹${base}/km/mo • Type x${mult} • Months: ${durationMonths}`;
+                document.getElementById('feeBreakdown').textContent = breakdown;
+                document.getElementById('feeResult').style.display = 'block';
+              } catch (e) {
+                console.error('Fee calculation error', e);
+                alert('Network error while calculating fee');
+              }
+            }
+
+            document.addEventListener('DOMContentLoaded', loadStops);
+          </script>
+
+          
+        </div>
+
+        <!-- My Pass Section -->
+<div id="my-pass" class="content-section">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-id-card text-primary me-2"></i> My Bus Pass</h2>
+    {% if active_pass %}
+    <div>
+      <button class="btn btn-msrtc-outline me-2" onclick="downloadPass({{ active_pass.application_id }})">
+        <i class="fas fa-download me-2"></i> Download
+      </button>
+      <button class="btn btn-msrtc-outline" onclick="viewPass({{ active_pass.application_id }})">
+        <i class="fas fa-print me-2"></i> View/Print
+      </button>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if active_pass %}
+  <div class="dashboard-card" data-aos="zoom-in">
+    <div class="id-card">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <div class="mb-4">
+            {% set ns = namespace(done=False) %}
+            {% for app in applications %}
+              {% if not ns.done and app.id == active_pass.application_id and app.profile_photo_path %}
+                <img src="{{ url_for('static', filename='uploads/' ~ (app.profile_photo_path|replace('\\', '/')) ) }}"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename=(app.profile_photo_path|replace('\\','/')) ) }}';"
+                     alt="Profile Photo"
+                     class="img-fluid rounded-circle border"
+                     style="width: 180px; height: 180px; object-fit: cover;">
+                {% set ns.done = True %}
+              {% endif %}
+            {% endfor %}
+            {% if not ns.done %}
+              <i class="fas fa-user-circle fa-10x text-secondary"></i>
+            {% endif %}
+          </div>
+          <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ active_pass.pass_number }}" alt="QR Code" class="img-fluid">
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-danger">MSRTC Student Bus Pass</h4>
+            <span class="badge bg-success">Active</span>
+          </div>
+          <hr>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Pass Number:</strong></p>
+              <p>{{ active_pass.pass_number }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Issued Date:</strong></p>
+              <p>{{ active_pass.issue_date }}</p>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Valid Until:</strong></p>
+              <p>{{ active_pass.expiry_date }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Status:</strong></p>
+              <p><span class="badge bg-success">Active</span></p>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Student Name:</strong></p>
+              <p>{{ user.full_name }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Student ID:</strong></p>
+              <p>{{ active_pass.student_id or 'N/A' }}</p>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>College/University:</strong></p>
+              <p>{{ active_pass.institution_name or 'N/A' }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Route:</strong></p>
+              <p>{{ active_pass.from_location }} to {{ active_pass.to_location }}</p>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-msrtc" onclick="showSection('renew-pass')">
+              <i class="fas fa-sync-alt me-2"></i> Renew Pass
+            </button>
+            <button class="btn btn-outline-primary" onclick="viewPass({{ active_pass.application_id }})">
+              <i class="fas fa-eye me-2"></i> View Pass
+            </button>
+            <button class="btn btn-outline-success" onclick="downloadPass({{ active_pass.application_id }})">
+              <i class="fas fa-download me-2"></i> Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  {% else %}
+  <div class="dashboard-card" data-aos="zoom-in">
+    <div class="alert alert-info mb-0">
+      <i class="fas fa-info-circle me-2"></i> You do not have an active pass yet. Check your application status or submit a new application.
+      <div class="mt-3">
+        <button class="btn btn-sm btn-msrtc-outline me-2" onclick="showSection('application-status')"><i class="fas fa-search me-1"></i> Check Status</button>
+        <button class="btn btn-sm btn-primary" onclick="showSection('new-application')"><i class="fas fa-file-alt me-1"></i> Apply Now</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+        <!-- New Application Section -->
+        <div id="new-application" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-file-alt text-primary me-2"></i> New Pass Application</h2>
+
+          <form id="applicationForm" action="{{ url_for('submit_application') }}" method="POST" enctype="multipart/form-data">
+          <div class="dashboard-card">
+            <div class="progress-steps">
+              <div class="progress-step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Personal Details</div>
+              </div>
+              <div class="progress-step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Institution Details</div>
+              </div>
+              <div class="progress-step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">Route Details</div>
+              </div>
+              <div class="progress-step" id="step4">
+                <div class="step-number">4</div>
+                <div class="step-label">Review & Submit</div>
+              </div>
+            </div>
+
+            <!-- Step 1: Personal Details -->
+            <div id="form-step1" class="form-section active">
+              <h4 class="mb-4">Personal Information</h4>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="fullName" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="fullName" name="fullName" value="{{ user.full_name }}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="gender" class="form-label">Gender</label>
+                  <select class="form-select" id="gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="phone" class="form-label">Contact Number</label>
+                  <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}" placeholder="Enter your contact number" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label for="address" class="form-label">Residential Address</label>
+                  <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="signature" class="form-label">Upload Signature</label>
+                  <input type="file" class="form-control" id="signature" name="signature" accept="image/*,.pdf" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="profilePhoto" class="form-label">Upload Profile Photo</label>
+                  <input type="file" class="form-control" id="profilePhoto" name="profilePhoto" accept="image/*" required>
+                  <small class="text-muted">Clear face photo (JPG/PNG), max 2MB.</small>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-msrtc" onclick="nextStep(1)">Next <i
+                    class="fas fa-arrow-right ms-2"></i></button>
+              </div>
+            </div>
+
+            <!-- Step 2: Institution Details -->
+            <div id="form-step2" class="form-section">
+              <h4 class="mb-4">Institution Information</h4>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="institutionType" class="form-label">Institution Type</label>
+                  <select class="form-select" id="institutionType">
+                    <option value="">Select Institution Type</option>
+                    <option value="school">School</option>
+                    <option value="college">College</option>
+                    <option value="university">University</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="institutionName" class="form-label">Institution Name</label>
+                  <input type="text" class="form-control" id="institutionName" name="institutionName" placeholder="Enter institution name" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="studentId" class="form-label">Student ID</label>
+                  <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter your student ID" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="course" class="form-label">Course/Class</label>
+                  <input type="text" class="form-control" id="course" name="course" placeholder="Enter your course/class" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="yearOfStudy" class="form-label">Year of Study</label>
+                  <select class="form-select" id="yearOfStudy" name="yearOfStudy" required>
+                    <option value="">Select Year</option>
+                    <option value="1st">1st Year</option>
+                    <option value="2nd">2nd Year</option>
+                    <option value="3rd">3rd Year</option>
+                    <option value="4th">4th Year</option>
+                    <option value="5th">5th Year</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="institutionAddress" class="form-label">Institution Address</label>
+                  <textarea class="form-control" id="institutionAddress" name="institutionAddress" rows="3" required></textarea>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left me-2"></i>
+                  Previous</button>
+                <button class="btn btn-msrtc" onclick="nextStep(2)">Next <i
+                    class="fas fa-arrow-right ms-2"></i></button>
+              </div>
+            </div>
+
+            <!-- Step 3: Route Details -->
+            <div id="form-step3" class="form-section">
+              <h4 class="mb-4">Route Information</h4>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="fromLocation" class="form-label">Starting Point</label>
+                  <input class="form-control" id="fromLocation" name="fromLocation" list="ratnagiriStops" placeholder="Type or choose a stop in Ratnagiri district" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="toLocation" class="form-label">Destination Point</label>
+                  <input class="form-control" id="toLocation" name="toLocation" list="ratnagiriStops" placeholder="Type or choose a stop in Ratnagiri district" required />
+                </div>
+                <div class="col-12">
+                  <div class="alert alert-info" id="routeFarePreview" style="display:none;">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                      <div><strong>Distance:</strong> <span id="naDistance">0</span> km</div>
+                      <div><strong>Normal/Trip:</strong> ₹<span id="naNormalTrip">0</span></div>
+                      <div><strong>Student/Trip:</strong> ₹<span id="naStudentTrip">0</span></div>
+                      <div><strong>Student Monthly (60 trips):</strong> ₹<span id="naStudentMonthly">0</span></div>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="calc_distance_km" id="calc_distance_km" />
+                <input type="hidden" name="calc_normal_per_trip" id="calc_normal_per_trip" />
+                <input type="hidden" name="calc_student_per_trip" id="calc_student_per_trip" />
+                <input type="hidden" name="calc_student_monthly" id="calc_student_monthly" />
+                <datalist id="ratnagiriStops">
+                  <option value="Karbude Phata"></option>
+                  <option value="Masebav"></option>
+                  <option value="Nivali"></option>
+                  <option value="Hathkhamba"></option>
+                  <option value="Panaval"></option>
+                  <option value="Khedshi"></option>
+                  <option value="Mahalakshmi Mandir"></option>
+                  <option value="Karawanchiwadi"></option>
+                  <option value="Railway Station"></option>
+                  <option value="Kuvarbav"></option>
+                  <option value="Dmart"></option>
+                  <option value="TRP"></option>
+                  <option value="JK File"></option>
+                  <option value="Shivaji Nagar"></option>
+                  <option value="Maruti Mandir"></option>
+                  <option value="Ratnagiri Bus Stand"></option>
+                </datalist>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="passType" class="form-label">Pass Type</label>
+                  <select class="form-select" id="passType" name="passType" required>
+                    <option value="">Select pass type</option>
+                    <option value="monthly">Monthly Pass</option>
+                    <option value="quarterly">Quarterly Pass</option>
+                    <option value="semester">Semester Pass</option>
+                    <option value="annual">Annual Pass</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="duration" class="form-label">Pass Duration</label>
+                  <select class="form-select" id="duration" name="duration" required>
+                    <option value="">Select duration</option>
+                    <option value="1-month">1 Month</option>
+                    <option value="3-months">3 Months</option>
+                    <option value="6-months">6 Months</option>
+                    <option value="1-year">1 Year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> The pass will be valid for the selected duration from the date
+                of approval.
+              </div>
+              <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-secondary" onclick="prevStep(3)"><i class="fas fa-arrow-left me-2"></i>
+                  Previous</button>
+                <button class="btn btn-msrtc" onclick="nextStep(3)">Next <i
+                    class="fas fa-arrow-right ms-2"></i></button>
+              </div>
+              </div>
+
+              <!-- Step 4: Review & Submit -->
+              <!-- Hidden field to submit combined route string to backend -->
+              <input type="hidden" id="routeDetails" name="routeDetails" />
+              <div id="form-step4" class="form-section">
+              <h4 class="mb-4">Review Your Application</h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card mb-4">
+                    <div class="card-header bg-light">
+                      <h5>Personal Details</h5>
+                    </div>
+                    <div class="card-body">
+                      <p><strong>Name:</strong> <span id="review-name">Rahul Sharma</span></p>
+                      <p><strong>Date of Birth:</strong> <span id="review-dob">15/05/2000</span></p>
+                      <p><strong>Gender:</strong> <span id="review-gender">Male</span></p>
+                      <p><strong>Contact:</strong> <span id="review-contact">Not provided</span></p>
+                      <p><strong>Address:</strong> <span id="review-address">Not provided</span></p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card mb-4">
+                    <div class="card-header bg-light">
+                      <h5>Institution Details</h5>
+                    </div>
+                    <div class="card-body">
+                      <p><strong>Institution:</strong> <span id="review-institution">Not provided</span></p>
+                      <p><strong>Student ID:</strong> <span id="review-studentId">Not provided</span></p>
+                      <p><strong>Course:</strong> <span id="review-course">Not provided</span></p>
+                      <p><strong>Address:</strong> <span id="review-institutionAddress">Not provided</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header bg-light">
+                      <h5>Route Details</h5>
+                    </div>
+                    <div class="card-body">
+                      <p><strong>Route:</strong> <span id="review-route">Not selected</span></p>
+                      <p><strong>Pass Type:</strong> <span id="review-passType">Not selected</span></p>
+                      <p><strong>Duration:</strong> <span id="review-duration">Not selected</span></p>
+                      <div class="mt-3">
+                        <h6 class="mb-2">Uploaded Signature</h6>
+                        <img id="review-signature" src="#" alt="Signature preview" style="max-width: 220px; max-height: 120px; border: 1px solid #ddd; border-radius: 6px; display: none;" />
+                      </div>
+                      <div class="mt-3">
+                        <h6 class="mb-2">Profile Photo</h6>
+                        <img id="review-photo" src="#" alt="Photo preview" style="max-width: 180px; max-height: 180px; border: 1px solid #ddd; border-radius: 6px; display: none;" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-check mt-4 mb-4">
+                <input class="form-check-input" type="checkbox" id="termsCheck">
+                <label class="form-check-label" for="termsCheck">
+                  I declare that all the information provided is correct to the best of my knowledge. I agree to the
+                  terms and conditions.
+                </label>
+              </div>
+              <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-secondary" onclick="prevStep(4)"><i class="fas fa-arrow-left me-2"></i>
+                  Previous</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check me-2"></i> Submit
+                  Application</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hidden fields -->
+          <input type="hidden" name="applicationType" value="new">
+          <input type="hidden" name="routeDetails" id="routeDetails">
+          </form>
+        </div>
+
+        <!-- Renew Pass Section -->
+        <div id="renew-pass" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-sync-alt text-primary me-2"></i> Renew Bus Pass</h2>
+
+          {% if active_pass %}
+          <div class="dashboard-card" data-aos="zoom-in">
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i> Your current pass ({{ active_pass.pass_number }}) will expire on {{ active_pass.pass_valid_until }}.
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <h4 class="mb-3">Current Pass Details</h4>
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <p><strong>Pass Number:</strong> {{ active_pass.pass_number }}</p>
+                    <p><strong>Issued On:</strong> {{ active_pass.issue_date }}</p>
+                    <p><strong>Valid Until:</strong> {{ active_pass.expiry_date }}</p>
+                    <p><strong>Route:</strong> {{ active_pass.from_location or '' }} to {{ active_pass.to_location or '' }}</p>
+                    <p><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h4 class="mb-3">Renewal Options</h4>
+                <div class="card">
+                  <div class="card-body">
+                    <form id="renewalForm" action="{{ url_for('submit_application') }}" method="POST" enctype="multipart/form-data">
+                      <div class="mb-3">
+                        <label class="form-label"><strong>Select Renewal Duration:</strong></label>
+                        <select class="form-select" name="duration" required>
+                          <option value="">Select duration</option>
+                          <option value="1-month">1 Month</option>
+                          <option value="3-months">3 Months</option>
+                          <option value="6-months">6 Months</option>
+                          <option value="1-year">1 Year</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label"><strong>Upload Updated Signature:</strong></label>
+                        <input type="file" class="form-control" name="signature" accept="image/*,.pdf" required>
+                      </div>
+                      <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> The renewed pass will be valid from the day after your current pass expires.
+                      </div>
+                      <button type="submit" class="btn btn-msrtc w-100">
+                        <i class="fas fa-sync-alt me-2"></i> Submit Renewal Application
+                      </button>
+                      
+                      <!-- Hidden fields for renewal -->
+                      <input type="hidden" name="applicationType" value="renewal">
+                      <input type="hidden" name="fullName" value="{{ user.full_name }}">
+                      <input type="hidden" name="email" value="{{ user.email }}">
+                      <input type="hidden" name="phone" value="{{ user.phone }}">
+                      <input type="hidden" name="fromLocation" value="{{ active_pass.from_location }}">
+                      <input type="hidden" name="toLocation" value="{{ active_pass.to_location }}">
+                      <input type="hidden" name="passType" value="{{ active_pass.pass_type }}">
+                      <input type="hidden" name="institutionName" value="{{ active_pass.institution_name }}">
+                      <input type="hidden" name="studentId" value="{{ active_pass.student_id }}">
+                      <input type="hidden" name="course" value="{{ active_pass.course }}">
+                      <input type="hidden" name="routeDetails" value="{{ active_pass.from_location or '' }} to {{ active_pass.to_location or '' }}">
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="dashboard-card" data-aos="zoom-in">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i> You don't have an active pass to renew. Please apply for a new pass first.
+              <div class="mt-3">
+                <button class="btn btn-primary" onclick="showSection('new-application')">
+                  <i class="fas fa-file-alt me-2"></i> Apply for New Pass
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Application Status Section -->
+        <div id="application-status" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-search text-primary me-2"></i> Application Status</h2>
+
+          <div class="dashboard-card" data-aos="fade-up">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Type</th>
+                    <th>Submitted On</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if applications %}
+                    {% for app in applications %}
+                      {% if app.status != 'payment_required' %}
+                      <tr>
+                        <td>{{ app.pass_number or 'N/A' }}</td>
+                        <td>{{ app.application_type.title() }}</td>
+                        <td>{{ app.submission_date.strftime('%d %b %Y') if app.submission_date else 'N/A' }}</td>
+                        <td>
+                          {% if app.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                          {% elif app.status == 'verified' %}
+                            <span class="badge bg-info">Verified</span>
+                          {% elif app.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                          {% elif app.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                          {% else %}
+                            <span class="badge bg-secondary">{{ app.status.title() }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-msrtc-outline" onclick="viewApplication({{ app.id }})">View</button>
+                          {% if app.status == 'approved' and app.pass_number %}
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="viewPass({{ app.id }})">View Pass</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="downloadPass({{ app.id }})">Download</button>
+                          {% elif app.status == 'rejected' %}
+                            <button class="btn btn-sm btn-outline-danger" onclick="reapplyApplication({{ app.id }})">Reapply</button>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">No applications found</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4">
+              <h5>Status Legend</h5>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-success me-2">Approved</span>
+                <span class="badge bg-warning me-2">Pending Verification</span>
+                <span class="badge bg-info me-2">Under Review</span>
+                <span class="badge bg-danger me-2">Rejected</span>
+                <span class="badge bg-secondary me-2">Expired</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-history text-primary me-2"></i> Pass History</h2>
+
+          <div class="dashboard-card" data-aos="fade-up">
+            <ul class="nav nav-tabs nav-tabs-custom" id="historyTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="current-tab" data-bs-toggle="tab" data-bs-target="#current"
+                  type="button" role="tab">Current Pass</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="previous-tab" data-bs-toggle="tab" data-bs-target="#previous" type="button"
+                  role="tab">Previous Passes</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications"
+                  type="button" role="tab">All Applications</button>
+              </li>
+            </ul>
+
+            <div class="tab-content p-3" id="historyTabsContent">
+              <div class="tab-pane fade show active" id="current" role="tabpanel">
+                {% if active_pass %}
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <h5>{{ active_pass.pass_number }}</h5>
+                        <p><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+                        <p><strong>Valid Until:</strong> {{ active_pass.expiry_date }}</p>
+                        <p><strong>Route:</strong> {{ active_pass.from_location or '' }} to {{ active_pass.to_location or '' }}</p>
+                      </div>
+                      <div class="col-md-6">
+                        <p><strong>Issued On:</strong> {{ active_pass.issue_date }}</p>
+                        <p><strong>Type:</strong> {{ active_pass.pass_type or 'Student Pass' }}</p>
+                        <p><strong>Duration:</strong> {{ active_pass.duration or 'N/A' }}</p>
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <button class="btn btn-sm btn-msrtc-outline me-2" onclick="downloadPass({{ active_pass.id }})">
+                        <i class="fas fa-download me-1"></i> Download
+                      </button>
+                      <button class="btn btn-sm btn-msrtc-outline me-2" onclick="viewPass({{ active_pass.id }})">
+                        <i class="fas fa-print me-1"></i> Print
+                      </button>
+                      <button class="btn btn-sm btn-warning" onclick="showSection('renew-pass')">
+                        <i class="fas fa-sync-alt me-1"></i> Renew
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle me-2"></i> You don't have an active pass currently.
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="tab-pane fade" id="previous" role="tabpanel">
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Pass Number</th>
+                        <th>Period</th>
+                        <th>Route</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for app in applications %}
+                        {% if app.status == 'approved' and app.pass_number and app.id != (active_pass.id if active_pass else 0) %}
+                        <tr>
+                          <td>{{ app.pass_number }}</td>
+                          <td>{{ app.pass_valid_from }} - {{ app.pass_valid_until }}</td>
+                          <td>{{ app.from_location or '' }} to {{ app.to_location or '' }}</td>
+                          <td><span class="badge bg-secondary">Expired</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-msrtc-outline" onclick="viewPass({{ app.id }})">View</button>
+                          </td>
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
+                      {% if not applications or not applications|selectattr('status', 'equalto', 'approved')|list %}
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">No previous passes found</td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="applications" role="tabpanel">
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Application ID</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for app in applications %}
+                      {% if app.status != 'payment_required' %}
+                      <tr>
+                        <td>APP-{{ app.id }}</td>
+                        <td>{{ app.application_type.title() }}</td>
+                        <td>{{ app.submission_date.strftime('%d %b %Y') if app.submission_date else 'N/A' }}</td>
+                        <td>
+                          {% if app.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                          {% elif app.status == 'verified' %}
+                            <span class="badge bg-info">Verified</span>
+                          {% elif app.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                          {% elif app.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                          {% else %}
+                            <span class="badge bg-secondary">{{ app.status.title() }}</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-msrtc-outline" onclick="viewApplication({{ app.id }})">View</button>
+                          {% if app.status == 'approved' and app.pass_number %}
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="viewPass({{ app.id }})">View Pass</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="downloadPass({{ app.id }})">Download</button>
+                          {% elif app.status == 'rejected' %}
+                            <button class="btn btn-sm btn-outline-danger" onclick="reapplyApplication({{ app.id }})">Reapply</button>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endif %}
+                      {% endfor %}
+                      {% if not applications %}
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">No applications found</td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+<div id="settings" class="content-section">
+  <h2 class="mb-4"><i class="fas fa-cog text-primary me-2"></i> Settings</h2>
+
+  <div class="dashboard-card" data-aos="fade-up">
+    <ul class="nav nav-tabs nav-tabs-custom" id="settingsTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+          type="button" role="tab">Profile</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button"
+          role="tab">Security</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications"
+          type="button" role="tab">Notifications</button>
+      </li>
+    </ul>
+
+    <div class="tab-content p-3" id="settingsTabsContent">
+      <!-- Profile Tab -->
+<div class="tab-pane fade show active" id="profile" role="tabpanel">
+  <form id="profileForm" action="/update_profile" method="POST">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="profileName" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="profileName" name="full_name" value="{{ user.full_name }}" required>
+      </div>
+      <div class="col-md-6">
+        <label for="profileEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" id="profileEmail" value="{{ user.email }}" disabled>
+        <div class="form-text">Email cannot be changed</div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="profilePhone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control" id="profilePhone" name="phone" value="{{ user.phone or '' }}">
+      </div>
+      <div class="col-md-6">
+        <label for="profileCollegeId" class="form-label">College ID</label>
+        <input type="text" class="form-control" id="profileCollegeId" name="college_id" value="{{ user.college_id or '' }}">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="profileUsername" class="form-label">Username</label>
+        <input type="text" class="form-control" id="profileUsername" name="username" value="{{ user.username }}" required>
+        <div class="form-text">You can change your username</div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-msrtc" id="updateProfileBtn">Update Profile</button>
+    <div id="profileUpdateMessage" class="mt-2" style="display: none;"></div>
+  </form>
+</div>
+      <!-- Security Tab -->
+      <div class="tab-pane fade" id="security" role="tabpanel">
+        <form id="passwordForm" action="/change_password" method="POST">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" name="new_password" minlength="8" required>
+            <div class="form-text">Password must be at least 8 characters long</div>
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+          </div>
+          <button type="submit" class="btn btn-msrtc" id="changePasswordBtn">Change Password</button>
+          <div id="passwordChangeMessage" class="mt-2" style="display: none;"></div>
+        </form>
+
+        <div class="mt-4 pt-3 border-top">
+          <h5>Account Security</h5>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Last password change: 
+            <span id="lastPasswordChange">
+              {% if user.last_password_change %}
+                {{ user.last_password_change.strftime('%d %b %Y') }}
+              {% else %}
+                Never changed
+              {% endif %}
+            </span>
+          </div>
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i> Last login: 
+            <span id="lastLogin">
+              {% if user.last_login %}
+                {{ user.last_login.strftime('%d %b %Y at %H:%M') }}
+              {% else %}
+                Not available
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div class="tab-pane fade" id="notifications" role="tabpanel">
+        <h5 class="mb-3">Notification Preferences</h5>
+        <form id="notificationsForm" action="/update_notifications" method="POST">
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="emailNotifications" name="email_notifications" 
+              {% if user.email_notifications %}checked{% endif %}>
+            <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="smsNotifications" name="sms_notifications"
+              {% if user.sms_notifications %}checked{% endif %}>
+            <label class="form-check-label" for="smsNotifications">SMS Notifications</label>
+          </div>
+
+          <h5 class="mt-4 mb-3">Notification Types</h5>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="passExpiry" name="pass_expiry_notifications"
+              {% if user.pass_expiry_notifications %}checked{% endif %}>
+            <label class="form-check-label" for="passExpiry">Pass Expiry Reminders</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="applicationUpdates" name="application_updates"
+              {% if user.application_updates %}checked{% endif %}>
+            <label class="form-check-label" for="applicationUpdates">Application Status Updates</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="promotional" name="promotional_notifications"
+              {% if user.promotional_notifications %}checked{% endif %}>
+            <label class="form-check-label" for="promotional">Promotional Offers</label>
+          </div>
+
+          <button type="submit" class="btn btn-msrtc mt-3" id="saveNotificationsBtn">Save Preferences</button>
+          <div id="notificationsUpdateMessage" class="mt-2" style="display: none;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>  
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <div class="footer-links">
+            <a href="#">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
+
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+
+          <p class="mb-0">© 2024 MahaPass - MSRTC Bus Pass System. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- FAQ Modal -->
+<div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="faqModalLabel">Frequently Asked Questions</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="accordion" id="faqAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeadingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true" aria-controls="faqCollapseOne">
+                How do I apply for a new bus pass?
+              </button>
+            </h2>
+            <div id="faqCollapseOne" class="accordion-collapse collapse show" aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                To apply for a new bus pass, navigate to the "New Application" section in your dashboard, fill in all the required details, upload necessary documents, and submit the application. Your application will be processed within 3-5 working days.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeadingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+                How can I renew my existing pass?
+              </button>
+            </h2>
+            <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                You can renew your pass from the "Renew Pass" section. The renewal option becomes available 15 days before your current pass expires. You'll need to upload a recent signature and select the renewal duration.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faqHeadingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+                What should I do if my pass is lost or stolen?
+              </button>
+            </h2>
+            <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                If your pass is lost or stolen, immediately report it to your college administration and apply for a duplicate pass. A nominal fee may be charged for issuing a duplicate pass.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Support Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="contactModalLabel">Contact Support</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="supportForm">
+          <div class="mb-3">
+            <label for="supportSubject" class="form-label">Subject</label>
+            <select class="form-select" id="supportSubject" required>
+              <option value="">Select subject</option>
+              <option value="application_issue">Application Issue</option>
+              <option value="pass_issue">Pass Related Issue</option>
+              <option value="payment_issue">Payment Issue</option>
+              <option value="technical_issue">Technical Issue</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="supportMessage" class="form-label">Message</label>
+            <textarea class="form-control" id="supportMessage" rows="4" required placeholder="Please describe your issue in detail"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="supportAttachment" class="form-label">Attachment (Optional)</label>
+            <input type="file" class="form-control" id="supportAttachment">
+          </div>
+        </form>
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> Our support team typically responds within 24 hours.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitSupportRequest()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feedbackModalLabel">Give Feedback</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="feedbackForm">
+          <div class="mb-3">
+            <label class="form-label">How would you rate your experience?</label>
+            <div class="d-flex justify-content-between mb-3">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rating" id="rating1" value="1">
+                <label class="form-check-label" for="rating1">1 ★</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rating" id="rating2" value="2">
+                <label class="form-check-label" for="rating2">2 ★</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rating" id="rating3" value="3" checked>
+                <label class="form-check-label" for="rating3">3 ★</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rating" id="rating4" value="4">
+                <label class="form-check-label" for="rating4">4 ★</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rating" id="rating5" value="5">
+                <label class="form-check-label" for="rating5">5 ★</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="feedbackCategory" class="form-label">Category</label>
+            <select class="form-select" id="feedbackCategory">
+              <option value="suggestion">Suggestion</option>
+              <option value="complaint">Complaint</option>
+              <option value="praise">Praise</option>
+              <option value="bug">Bug Report</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="feedbackMessage" class="form-label">Your Feedback</label>
+            <textarea class="form-control" id="feedbackMessage" rows="4" required placeholder="Please share your thoughts..."></textarea>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="contactPermission">
+            <label class="form-check-label" for="contactPermission">
+              I agree to be contacted for follow-up on this feedback
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About MahaPass</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <img src="{{ url_for('static', filename='images/logobus1.png') }}" alt="MahaPass Logo" style="height: 80px;">
+          <h4 class="mt-2">MahaPass Bus Pass System</h4>
+        </div>
+        <p>MahaPass is the official digital bus pass system of Maharashtra State Road Transport Corporation (MSRTC), designed to simplify the process of applying for, renewing, and managing student bus passes.</p>
+        
+        <h6>Key Features:</h6>
+        <ul>
+          <li>Online application and renewal</li>
+          <li>Digital pass available on mobile</li>
+          <li>Real-time application tracking</li>
+          <li>Secure and convenient process</li>
+        </ul>
+        
+        <p class="mb-0"><strong>Version:</strong> 2.1.0</p>
+        <p><strong>Last Updated:</strong> January 2024</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    // Preview signature and profile photo in Review step
+    (function() {
+      const sigInput = document.getElementById('signature');
+      const photoInput = document.getElementById('profilePhoto');
+      const sigPreview = document.getElementById('review-signature');
+      const photoPreview = document.getElementById('review-photo');
+
+      function previewFile(inputEl, imgEl) {
+        if (!inputEl || !imgEl) return;
+        const file = inputEl.files && inputEl.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imgEl.src = e.target.result;
+          imgEl.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      if (sigInput) {
+        sigInput.addEventListener('change', function() { previewFile(sigInput, sigPreview); });
+      }
+      if (photoInput) {
+        photoInput.addEventListener('change', function() { previewFile(photoInput, photoPreview); });
+      }
+    })();
+    // Initialize AOS animation
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+    // Mark all notifications as read
+function markAllAsRead() {
+  fetch('/mark_notifications_read', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Update the UI to show all notifications as read
+      document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.classList.remove('unread-notification');
+      });
+      
+      // Hide the notification badge
+      const badge = document.querySelector('#notificationDropdown .badge');
+      if (badge) {
+        badge.style.display = 'none';
+      }
+      
+      // Show success message
+      showFlashMessage('All notifications marked as read', 'success');
+    } else {
+      showFlashMessage('Failed to mark notifications as read', 'danger');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showFlashMessage('Failed to mark notifications as read', 'danger');
+  });
+}
+
+// Submit support request
+function submitSupportRequest() {
+  const formData = new FormData();
+  formData.append('subject', document.getElementById('supportSubject').value);
+  formData.append('message', document.getElementById('supportMessage').value);
+  
+  const attachment = document.getElementById('supportAttachment').files[0];
+  if (attachment) {
+    formData.append('attachment', attachment);
+  }
+  
+  fetch('/submit_support_request', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Close the modal and show success message
+      bootstrap.Modal.getInstance(document.getElementById('contactModal')).hide();
+      showFlashMessage('Support request submitted successfully', 'success');
+      document.getElementById('supportForm').reset();
+    } else {
+      showFlashMessage('Failed to submit support request: ' + data.message, 'danger');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showFlashMessage('Failed to submit support request', 'danger');
+  });
+}
+
+// Submit feedback
+function submitFeedback() {
+  const rating = document.querySelector('input[name="rating"]:checked').value;
+  const category = document.getElementById('feedbackCategory').value;
+  const message = document.getElementById('feedbackMessage').value;
+  const contactPermission = document.getElementById('contactPermission').checked;
+  
+  fetch('/submit_feedback', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rating: rating,
+      category: category,
+      message: message,
+      contact_permission: contactPermission
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Close the modal and show success message
+      bootstrap.Modal.getInstance(document.getElementById('feedbackModal')).hide();
+      showFlashMessage('Thank you for your feedback!', 'success');
+      document.getElementById('feedbackForm').reset();
+    } else {
+      showFlashMessage('Failed to submit feedback: ' + data.message, 'danger');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showFlashMessage('Failed to submit feedback', 'danger');
+  });
+}
+
+// Helper function to show flash messages
+function showFlashMessage(message, type) {
+  const flashContainer = document.getElementById('flashMessages');
+  const flashMessage = document.createElement('div');
+  flashMessage.className = `flash-message ${type}`;
+  flashMessage.innerHTML = `
+    <span>${message}</span>
+    <button class="close-btn" onclick="closeFlashMessage(this)">&times;</button>
+  `;
+  flashContainer.appendChild(flashMessage);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (flashMessage.parentElement) {
+      flashMessage.style.animation = 'slideOutRight 0.3s ease-in forwards';
+      setTimeout(() => {
+        flashMessage.remove();
+      }, 300);
+    }
+  }, 5000);
+}
+
+    // Toggle sidebar on mobile
+    document.querySelector('.navbar-toggler').addEventListener('click', function () {
+      document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    // New Application: compute fare from selected route and preview it
+    (function() {
+      const PER_KM = 1.25; // assumed per km rate
+      const stops = [
+        'Karbude Phata','Masebav','Nivali','Hathkhamba','Panaval','Khedshi',
+        'Mahalakshmi Mandir','Karawanchiwadi','Railway Station','Kuvarbav','Dmart',
+        'TRP','JK File','Shivaji Nagar','Maruti Mandir','Ratnagiri Bus Stand'
+      ];
+      const segmentKm = [2.1,3.2,4.0,1.7,2.3,1.0,1.0,1.0,0.5,1.0,1.0,1.0,1.2,1.0,2.0];
+
+      function compute(from, to) {
+        const si = stops.indexOf(from);
+        const ei = stops.indexOf(to);
+        if (si === -1 || ei === -1 || si === ei) return null;
+        let km = 0;
+        if (si < ei) { for (let i = si; i < ei; i++) km += segmentKm[i]; }
+        else { for (let i = ei; i < si; i++) km += segmentKm[i]; }
+        const normal = Math.round(km * PER_KM);
+        const student = Math.round(normal * 0.3333);
+        const monthly = Math.round(student * 60);
+        return { km: Number(km.toFixed(1)), normal, student, monthly };
+      }
+
+      function update() {
+        const fromEl = document.getElementById('fromLocation');
+        const toEl = document.getElementById('toLocation');
+        if (!fromEl || !toEl) return;
+        const res = compute((fromEl.value || '').trim(), (toEl.value || '').trim());
+        const preview = document.getElementById('routeFarePreview');
+        if (!preview) return;
+        if (!res) { preview.style.display = 'none'; return; }
+        document.getElementById('naDistance').textContent = res.km.toString();
+        document.getElementById('naNormalTrip').textContent = res.normal.toString();
+        document.getElementById('naStudentTrip').textContent = res.student.toString();
+        document.getElementById('naStudentMonthly').textContent = res.monthly.toLocaleString('en-IN');
+        document.getElementById('calc_distance_km').value = res.km;
+        document.getElementById('calc_normal_per_trip').value = res.normal;
+        document.getElementById('calc_student_per_trip').value = res.student;
+        document.getElementById('calc_student_monthly').value = res.monthly;
+        preview.style.display = 'block';
+      }
+
+      ['fromLocation','toLocation'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('change', update);
+          el.addEventListener('input', update);
+        }
+      });
+    })();
+
+    // Show specific section
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Show selected section
+      document.getElementById(sectionId).classList.add('active');
+
+      // Update sidebar menu active item
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === sectionId) {
+          item.classList.add('active');
+        }
+      });
+
+      // Update navbar underline (use fw-bold to trigger ::before underline)
+      document.querySelectorAll('.navbar-nav .nav-link[data-section]').forEach(link => {
+        link.classList.remove('fw-bold');
+        if (link.getAttribute('data-section') === sectionId) {
+          link.classList.add('fw-bold');
+        }
+      });
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+  // Initialize navbar underline to match the currently active section on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const active = document.querySelector('.content-section.active');
+    document.querySelectorAll('.navbar-nav .nav-link[data-section]').forEach(link => {
+      link.classList.toggle('fw-bold', active && link.getAttribute('data-section') === active.id);
+    });
+  });
+
+  // Form step navigation
+    function nextStep(currentStep) {
+      document.getElementById(`form-step${currentStep}`).classList.remove('active');
+      document.getElementById(`form-step${currentStep + 1}`).classList.add('active');
+
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${currentStep}`).classList.add('completed');
+      document.getElementById(`step${currentStep + 1}`).classList.add('active');
+
+      // Update review section with entered data
+      if (currentStep === 1) {
+        document.getElementById('review-name').textContent = document.getElementById('fullName').value;
+        document.getElementById('review-dob').textContent = document.getElementById('dateOfBirth').value;
+        document.getElementById('review-gender').textContent = document.getElementById('gender').value;
+        document.getElementById('review-contact').textContent = document.getElementById('phone').value || 'Not provided';
+        document.getElementById('review-address').textContent = document.getElementById('address').value || 'Not provided';
+      } else if (currentStep === 2) {
+        document.getElementById('review-institution').textContent = document.getElementById('institutionName').value || 'Not provided';
+        document.getElementById('review-studentId').textContent = document.getElementById('studentId').value || 'Not provided';
+        document.getElementById('review-course').textContent = document.getElementById('course').value || 'Not provided';
+        document.getElementById('review-institutionAddress').textContent = document.getElementById('institutionAddress').value || 'Not provided';
+      } else if (currentStep === 3) {
+        const fromLocationInput = document.getElementById('fromLocation');
+        const toLocationInput = document.getElementById('toLocation');
+        const passType = document.getElementById('passType');
+        const duration = document.getElementById('duration');
+
+        const fromText = (fromLocationInput && fromLocationInput.value) ? fromLocationInput.value : 'Not selected';
+        const toText = (toLocationInput && toLocationInput.value) ? toLocationInput.value : 'Not selected';
+        document.getElementById('review-route').textContent = `${fromText} to ${toText}`;
+        document.getElementById('review-passType').textContent = passType.options[passType.selectedIndex]?.text || 'Not selected';
+        document.getElementById('review-duration').textContent = duration.options[duration.selectedIndex]?.text || 'Not selected';
+      }
+    }
+
+    function prevStep(currentStep) {
+      document.getElementById(`form-step${currentStep}`).classList.remove('active');
+      document.getElementById(`form-step${currentStep - 1}`).classList.add('active');
+
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${currentStep - 1}`).classList.add('active');
+      document.getElementById(`step${currentStep - 1}`).classList.remove('completed');
+    }
+
+    // Update route details when form is submitted and set signature preview
+    document.getElementById('applicationForm').addEventListener('submit', function(e) {
+      if (!document.getElementById('termsCheck').checked) {
+        e.preventDefault();
+        alert('Please accept the terms and conditions');
+        return;
+      }
+      
+      // Populate route details
+      const fromLocation = document.getElementById('fromLocation').value;
+      const toLocation = document.getElementById('toLocation').value;
+      const routeDetails = `${fromLocation} to ${toLocation}`;
+      document.getElementById('routeDetails').value = routeDetails;
+    });
+
+    // Preview signature when selected
+    const signatureInput = document.getElementById('signature');
+    if (signatureInput) {
+      signatureInput.addEventListener('change', function () {
+        const file = this.files && this.files[0];
+        const previewImg = document.getElementById('review-signature');
+        if (!file || !previewImg) {
+          return;
+        }
+        const url = URL.createObjectURL(file);
+        previewImg.src = url;
+        previewImg.style.display = 'block';
+      });
+    }
+
+    // Process renewal
+    function processRenewal() {
+      // In a real app, you would process payment here
+      alert('Payment processed successfully! Your pass will be renewed.');
+      showSection('my-pass');
+    }
+
+    // Initialize pass duration options based on pass type
+    document.getElementById('passType').addEventListener('change', function () {
+      const passType = this.value;
+      const passDuration = document.getElementById('passDuration');
+
+      // Clear existing options
+      passDuration.innerHTML = '<option value="">Select duration</option>';
+
+      if (passType === 'monthly') {
+        passDuration.disabled = false;
+        passDuration.innerHTML += `
+        <option value="1">1 Month</option>
+      `;
+      } else if (passType === 'quarterly') {
+        passDuration.disabled = false;
+        passDuration.innerHTML += `
+        <option value="3">3 Months</option>
+      `;
+      } else if (passType === 'semester') {
+        passDuration.disabled = false;
+        passDuration.innerHTML += `
+        <option value="6">6 Months</option>
+      `;
+      } else if (passType === 'annual') {
+        passDuration.disabled = false;
+        passDuration.innerHTML += `
+        <option value="12">1 Year</option>
+      `;
+      } else {
+        passDuration.disabled = true;
+      }
+    });
+
+    // Flash message functionality
+    function closeFlashMessage(button) {
+      const message = button.parentElement;
+      message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+      setTimeout(() => {
+        message.remove();
+      }, 300);
+    }
+
+    // Auto-hide flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        setTimeout(() => {
+          if (message.parentElement) {
+            message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+            setTimeout(() => {
+              message.remove();
+            }, 300);
+          }
+        }, 5000);
+      });
+    });
+
+    // Initialize sidebar menu click handlers
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+      item.addEventListener('click', function (e) {
+        const sectionId = this.getAttribute('data-section');
+        const href = this.getAttribute('href');
+        
+        // If it's a logout link or external link, don't prevent default
+        if (href && (href.includes('logout') || href.startsWith('http') || href.startsWith('/'))) {
+          return; // Allow default behavior for logout and external links
+        }
+        
+        // For section navigation, prevent default and show section
+        e.preventDefault();
+        if (sectionId) {
+          showSection(sectionId);
+        }
+      });
+    });
+
+    // Add scroll event for navbar
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 50) {
+        document.querySelector('.navbar').classList.add('scrolled');
+      } else {
+        document.querySelector('.navbar').classList.remove('scrolled');
+      }
+    });
+
+    // Pass Fee Calculator function (single route)
+    function calculateFee() {
+      const startPoint = (document.getElementById('startPointCalc').value || '').trim();
+      const endPoint = (document.getElementById('endPointCalc').value || '').trim();
+
+      if (!startPoint || !endPoint) {
+        alert('Please enter both starting and destination points.');
+        return;
+      }
+
+      // Supported route stops in order
+      const stops = [
+        'Karbude Phata', 'Masebav', 'Nivali', 'Hathkhamba', 'Panaval', 'Khedshi',
+        'Mahalakshmi Mandir', 'Karawanchiwadi', 'Railway Station', 'Kuvarbav', 'Dmart',
+        'TRP', 'JK File', 'Shivaji Nagar', 'Maruti Mandir', 'Ratnagiri Bus Stand'
+      ];
+      // Segment distances (km) for consecutive stops
+      const segmentKm = [2.1, 3.2, 4.0, 1.7, 2.3, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.2, 1.0, 2.0];
+
+      const si = stops.indexOf(startPoint);
+      const ei = stops.indexOf(endPoint);
+      if (si === -1 || ei === -1) {
+        alert('Only the Karbude Phata → Ratnagiri Bus Stand route is supported. Please pick from suggestions.');
+        return;
+      }
+      if (si === ei) {
+        alert('Starting point and destination cannot be the same.');
+        return;
+      }
+
+      // Sum distances between indices
+      let km = 0;
+      if (si < ei) {
+        for (let i = si; i < ei; i++) km += segmentKm[i];
+      } else {
+        for (let i = ei; i < si; i++) km += segmentKm[i];
+      }
+
+      // Fare calculations
+      const PER_KM = 1.25;
+      const normalPerTrip = Math.round(km * PER_KM);
+      const studentPerTrip = Math.round(normalPerTrip * 0.3333);
+      const studentMonthly = Math.round(studentPerTrip * 60);
+
+      // Update UI
+      const distEl = document.getElementById('calculatedDistance');
+      const normalEl = document.getElementById('normalPerTrip');
+      const studTripEl = document.getElementById('studentPerTrip');
+      const studMonthEl = document.getElementById('studentMonthly');
+      if (distEl) distEl.textContent = km.toFixed(1);
+      if (normalEl) normalEl.textContent = normalPerTrip.toString();
+      if (studTripEl) studTripEl.textContent = studentPerTrip.toString();
+      if (studMonthEl) studMonthEl.textContent = studentMonthly.toLocaleString('en-IN');
+      document.getElementById('feeResult').style.display = 'block';
+    }
+
+    // Pass viewing and downloading functions
+    function viewPass(applicationId) {
+      window.open(`/user/view_pass/${applicationId}`, '_blank');
+    }
+
+    function downloadPass(applicationId) {
+      window.location.href = `/user/download_pass/${applicationId}`;
+    }
+
+    function viewApplication(applicationId) {
+      // Placeholder for viewing application details
+      alert('Application details view coming soon!');
+    }
+
+    function reapplyApplication(applicationId) {
+      // Placeholder for reapplication
+      alert('Reapplication feature coming soon!');
+    }
+    // Handle profile form submission
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const btn = document.getElementById('updateProfileBtn');
+    const messageDiv = document.getElementById('profileUpdateMessage');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+    
+    fetch('/update_profile', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.className = 'alert alert-success mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+            
+            // Update UI elements with new data
+            if (formData.get('full_name')) {
+                // Update the user name in the sidebar
+                document.querySelector('.sidebar-header h5').textContent = formData.get('full_name');
+                // Update the welcome message
+                const welcomeElement = document.querySelector('.dashboard-hero-img h1');
+                if (welcomeElement) {
+                    welcomeElement.textContent = `Welcome, ${formData.get('full_name')}!`;
+                }
+            }
+            
+            // Clear the form message after 3 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        } else {
+            messageDiv.className = 'alert alert-danger mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        messageDiv.className = 'alert alert-danger mt-2';
+        messageDiv.innerHTML = 'Error updating profile';
+        messageDiv.style.display = 'block';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Update Profile';
+    });
+});
+
+// Handle password form submission
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const btn = document.getElementById('changePasswordBtn');
+    const messageDiv = document.getElementById('passwordChangeMessage');
+    
+    // Validate password match
+    if (formData.get('new_password') !== formData.get('confirm_password')) {
+        messageDiv.className = 'alert alert-danger mt-2';
+        messageDiv.innerHTML = 'New passwords do not match';
+        messageDiv.style.display = 'block';
+        return;
+    }
+    
+    // Validate password length
+    if (formData.get('new_password').length < 8) {
+        messageDiv.className = 'alert alert-danger mt-2';
+        messageDiv.innerHTML = 'Password must be at least 8 characters long';
+        messageDiv.style.display = 'block';
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Changing...';
+    
+    fetch('/change_password', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.className = 'alert alert-success mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+            this.reset();
+            
+            // Clear the form message after 3 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        } else {
+            messageDiv.className = 'alert alert-danger mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        messageDiv.className = 'alert alert-danger mt-2';
+        messageDiv.innerHTML = 'Error changing password';
+        messageDiv.style.display = 'block';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Change Password';
+    });
+});
+
+// Handle notifications form submission
+document.getElementById('notificationsForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const btn = document.getElementById('saveNotificationsBtn');
+    const messageDiv = document.getElementById('notificationsUpdateMessage');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+    
+    fetch('/update_notifications', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.className = 'alert alert-success mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+            
+            // Clear the form message after 3 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        } else {
+            messageDiv.className = 'alert alert-danger mt-2';
+            messageDiv.innerHTML = data.message;
+            messageDiv.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        messageDiv.className = 'alert alert-danger mt-2';
+        messageDiv.innerHTML = 'Error saving preferences';
+        messageDiv.style.display = 'block';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Preferences';
+    });
+});
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var toggleBtn = document.getElementById('sidebarToggle');
+      var sidebar = document.getElementById('sidebar');
+      var overlay = document.getElementById('sidebarOverlay');
+      if (toggleBtn && sidebar && overlay) {
+        function openSidebar() {
+          sidebar.classList.add('active');
+          overlay.classList.add('active');
+        }
+        function closeSidebar() {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+        }
+        toggleBtn.addEventListener('click', function() {
+          if (sidebar.classList.contains('active')) {
+            closeSidebar();
+          } else {
+            openSidebar();
+          }
+        });
+        overlay.addEventListener('click', closeSidebar);
+        document.querySelectorAll('.sidebar .menu-item').forEach(function(el){
+          el.addEventListener('click', closeSidebar);
+        });
+      }
+    });
+  </script>
+  </body>
+
+  </html>

@@ -1,0 +1,2558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MahaPass - Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logobus1.png') }}">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --msrtc-red: #D40000;
+      --msrtc-dark-red: #8B0000;
+      --msrtc-yellow: #FFD700;
+      --msrtc-black: #222222;
+      --msrtc-light: #FFF5F5;
+      --sidebar-width: 280px;
+      --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      overflow-x: hidden;
+      color: var(--msrtc-black);
+      padding-top: 70px;
+    }
+
+    /* Navbar with logo */
+    .navbar {
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red)) !important;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1030;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s ease;
+      min-height: 70px;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--msrtc-yellow);
+    }
+
+    .navbar.scrolled {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000) !important;
+      min-height: 60px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-brand {
+      padding: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand img {
+      height: 140px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 6px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .navbar.scrolled .navbar-brand img {
+      height: 100px;
+    }
+
+    .navbar-nav .nav-link {
+      color: #ffeaea !important;
+      font-weight: 500;
+      padding: 12px 18px;
+      margin: 0 5px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: var(--msrtc-yellow);
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:hover:before,
+    .navbar-nav .nav-link.fw-bold:before {
+      width: 80%;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.fw-bold {
+      color: #ffffff !important;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-light {
+      color: #fff;
+      border: 2px solid #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: var(--transition);
+      border-radius: 8px;
+      padding: 8px 20px;
+    }
+
+    .btn-outline-light:hover {
+      background-color: #fff;
+      color: var(--msrtc-red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Sidebar Styles - UPDATED */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: white;
+      position: relative;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+      background: var(--msrtc-light);
+    }
+    /* Add to your existing CSS */
+.document-thumbnail {
+  max-height: 120px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.document-card {
+  transition: transform 0.2s ease;
+  height: 100%;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.modal-xl {
+  max-width: 1200px;
+}
+
+/* File input styling */
+.form-control-file {
+  border: 1px dashed #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+}
+
+.form-control-file:hover {
+  border-color: #007bff;
+  background-color: #e9ecef;
+}
+
+    .profile-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-menu {
+      padding: 15px 0;
+    }
+
+    .sidebar-menu .menu-item {
+      padding: 12px 20px;
+      color: var(--msrtc-black);
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+      margin: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .sidebar-menu .menu-item:hover,
+    .sidebar-menu .menu-item.active {
+      background: var(--msrtc-light);
+      color: var(--msrtc-red);
+      border-left: 3px solid var(--msrtc-red);
+      transform: translateX(5px);
+    }
+
+    .sidebar-menu .menu-item i {
+      margin-right: 10px;
+      width: 24px;
+      text-align: center;
+      color: var(--msrtc-red);
+    }
+
+    .sidebar-menu .menu-item.active i {
+      color: var(--msrtc-red);
+    }
+
+    /* Main Content - UPDATED */
+    .main-content {
+      margin-left: 0;
+      padding: 25px;
+      transition: var(--transition);
+      min-height: calc(100vh - 70px);
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-value {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--msrtc-red);
+      line-height: 1;
+      margin: 10px 0;
+    }
+
+    .card-label {
+      color: #666;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* Status Badges */
+    .badge-pending {
+      background-color: #ffc107;
+      color: white;
+    }
+
+    .badge-approved {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .badge-rejected {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .badge-expired {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    /* Table Styling */
+    .table-custom {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+
+    .table-custom thead th {
+      background: var(--msrtc-red);
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      position: sticky;
+      top: 0;
+    }
+
+    .table-custom tbody tr {
+      transition: var(--transition);
+    }
+
+    .table-custom tbody tr:hover {
+      background: var(--msrtc-light);
+      transform: translateX(5px);
+    }
+
+    .table-custom tbody td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    /* Tab Styling */
+    .nav-tabs-custom .nav-link {
+      color: var(--msrtc-black);
+      font-weight: 500;
+      border: none;
+      padding: 12px 20px;
+      position: relative;
+    }
+
+    .nav-tabs-custom .nav-link.active {
+      color: var(--msrtc-red);
+      background: transparent;
+    }
+
+    .nav-tabs-custom .nav-link.active:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--msrtc-red);
+    }
+
+    .nav-tabs-custom .nav-link:hover:not(.active) {
+      color: var(--msrtc-red);
+    }
+
+    /* Content sections */
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* Buttons */
+    .btn-msrtc {
+      background: var(--msrtc-red);
+      color: white;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 8px;
+      border: none;
+      transition: var(--transition);
+      box-shadow: 0 4px 8px rgba(212, 0, 0, 0.2);
+    }
+
+    .btn-msrtc:hover {
+      background: var(--msrtc-dark-red);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(212, 0, 0, 0.3);
+    }
+
+    .btn-msrtc-outline {
+      background: transparent;
+      color: var(--msrtc-red);
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 8px;
+      border: 2px solid var(--msrtc-red);
+      transition: var(--transition);
+    }
+
+    .btn-msrtc-outline:hover {
+      background: var(--msrtc-red);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212, 0, 0, 0.2);
+    }
+
+    /* Footer - UPDATED */
+    .footer {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000);
+      color: white;
+      padding: 30px 0;
+      margin-left: 0;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .footer a {
+      color: var(--msrtc-yellow);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .social-icons a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .social-icons a:hover {
+      background: var(--msrtc-yellow);
+      color: var(--msrtc-red);
+      transform: translateY(-3px);
+    }
+
+    /* Responsive - UPDATED */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .footer {
+        margin-left: 0;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .slide-up {
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--msrtc-red);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--msrtc-dark-red);
+    }
+
+    /* Dashboard Layout - UPDATED */
+    .dashboard-layout {
+      display: flex;
+      min-height: calc(100vh - 70px - 90px);
+    }
+
+    /* Notification Bell */
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--msrtc-yellow);
+      color: var(--msrtc-dark-red);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+      border-radius: 15px;
+      border: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red));
+      color: white;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+    }
+
+    /* ID Card Preview */
+    .id-card {
+      background: linear-gradient(135deg, #ffffff, #f9f9f9);
+      border-radius: 15px;
+      border: 2px solid var(--msrtc-yellow);
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .id-card:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23D40000" opacity="0.05"><text x="0" y="50" font-family="Arial" font-size="20" transform="rotate(-45)">MSRTC OFFICIAL</text></svg>');
+      background-repeat: repeat;
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      flex: 1;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--msrtc-red);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* Flash Messages */
+    .flash-messages {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1050;
+      max-width: 400px;
+    }
+
+    .flash-message {
+      margin-bottom: 10px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      /* CSS-only fallback: auto-hide after 5s */
+      animation: slideInRight 0.5s ease-out, autoHide 0.3s ease-in 5s forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flash-message.success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+
+    .flash-message.danger {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+
+    .flash-message.info {
+      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .flash-message.warning {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+
+    .flash-message .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .flash-message .close-btn:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    /* CSS-only fallback keyframes to fade and collapse flash messages after 5s */
+    @keyframes autoHide {
+      0% {
+        opacity: 1;
+        max-height: 200px;
+        margin-bottom: 10px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+      100% {
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+.dropdown-item small {
+  font-size: 0.75rem;
+}
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+   
+  </style>
+</head>
+
+<body>
+
+  <!-- Flash Messages -->
+  <div class="flash-messages" id="flashMessages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="closeFlashMessage(this)">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <script>
+    (function() {
+      const container = document.getElementById('flashMessages');
+      if (!container) return;
+      function schedule(el) {
+        if (!el || el.dataset.autoHideScheduled === '1') return;
+        el.dataset.autoHideScheduled = '1';
+        setTimeout(() => {
+          if (el && el.parentElement) {
+            el.style.animation = 'slideOutRight 0.3s ease-in forwards';
+            setTimeout(() => {
+              if (el && el.parentElement) el.remove();
+            }, 300);
+          }
+        }, 5000);
+      }
+      container.querySelectorAll('.flash-message').forEach(schedule);
+
+      // Final fallback: clear any remaining flashes after 6s
+      setTimeout(() => {
+        if (container) {
+          container.querySelectorAll('.flash-message').forEach(el => el.remove());
+        }
+      }, 6000);
+    })();
+  </script>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/logobus1.png') }}" alt="Smart Bus Pass Logo" />
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="#">Admin Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#reports" onclick="showSection('reports'); return false;">Reports</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#applications" onclick="showSection('applications'); return false;">Applications</a>
+          </li>
+        </ul>
+
+        <div class="d-flex">
+  <div class="dropdown me-2">
+    <button class="btn btn-outline-light position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
+      <i class="fas fa-bell"></i>
+      {% if notification_count > 0 %}
+      <span class="notification-badge">{{ notification_count }}</span>
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><h6 class="dropdown-header">Notifications</h6></li>
+      {% if notifications %}
+        {% for notification in notifications %}
+        <li><a class="dropdown-item" href="#">
+          {{ notification.message }}
+          <br><small class="text-muted">{{ notification.timestamp.strftime('%d %b %Y, %I:%M %p') }}</small>
+        </a></li>
+        {% endfor %}
+      {% else %}
+        <li><a class="dropdown-item text-muted" href="#">No new notifications</a></li>
+      {% endif %}
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-center" href="#applications" onclick="showSection('applications'); return false;">View All Applications</a></li>
+    </ul>
+  </div>
+  
+  <div class="dropdown">
+    <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+      <i class="fas fa-user-cog me-2"></i> {{ current_user.full_name }}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><h6 class="dropdown-header">Admin Information</h6></li>
+      <li><a class="dropdown-item" href="#">
+        <i class="fas fa-user me-2"></i> {{ current_user.full_name }}
+      </a></li>
+      <li><a class="dropdown-item" href="#">
+        <i class="fas fa-at me-2"></i> {{ current_user.username }}
+      </a></li>
+      <li><a class="dropdown-item" href="#">
+        <i class="fas fa-shield me-2"></i> {{ current_user.role }}
+      </a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#settings" onclick="showSection('settings'); return false;">
+        <i class="fas fa-cog me-2"></i> Settings
+      </a></li>
+      <li><a class="dropdown-item" href="{{ url_for('logout') }}" onclick="return confirm('Are you sure you want to logout?')">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+      </a></li>
+    </ul>
+  </div>
+</div>
+      </div>
+    </div>
+  </nav>
+  
+
+
+  <!-- Dashboard Layout: Sidebar + Main Content -->
+  <div class="dashboard-layout d-flex">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="profile-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h5 class="text-center mt-2">{{ current_user.full_name or 'Admin User' }}</h5>
+        <p class="text-muted text-center small">{{ current_user.role or 'MSRTC Administrator' }}</p>
+      </div>
+
+      <div class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" data-section="dashboard" onclick="showSection('dashboard'); return false;">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="#applications" class="menu-item" data-section="applications" onclick="showSection('applications'); return false;">
+          <i class="fas fa-file-alt"></i> Applications
+          <span class="badge bg-danger ms-2">{{ pending_applications_count }}</span>
+        </a>
+
+        <a href="#pass-management" class="menu-item" data-section="pass-management" onclick="showSection('pass-management'); return false;">
+          <i class="fas fa-id-card"></i> Pass Management
+        </a>
+
+        <a href="#reports" class="menu-item" data-section="reports" onclick="showSection('reports'); return false;">
+          <i class="fas fa-chart-bar"></i> Reports & Analytics
+        </a>
+
+        <a href="#settings" class="menu-item" data-section="settings" onclick="showSection('settings'); return false;">
+          <i class="fas fa-cog"></i> System Settings
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+    <div class="main-content" id="main-content">
+      <div class="container-fluid">
+        <!-- Dashboard Section -->
+<div id="dashboard" class="content-section active">
+  <h2 class="mb-4"><i class="fas fa-tachometer-alt text-primary me-2"></i> Admin Dashboard</h2>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    <div class="stat-item">
+      <div class="stat-value">{{ pending_count }}</div>
+      <div class="stat-label">Pending Applications</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ approved_count }}</div>
+      <div class="stat-label">Approved This Month</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ rejected_count }}</div>
+      <div class="stat-label">Rejected Applications</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">{{ active_passes_count }}</div>
+      <div class="stat-label">Total Active Passes</div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="dashboard-card">
+    <h4 class="mb-4">Recent Activity</h4>
+    <div class="table-responsive">
+      <table class="table table-custom">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Activity</th>
+    <th>User</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if recent_activities %}
+            {% for activity in recent_activities %}
+            <tr>
+              <td>{{ activity.timestamp.strftime('%I:%M %p') }}</td>
+              <td>{{ activity.activity_type }}</td>
+              <td>{{ activity.user_name }}</td>
+              <td>{{ activity.details }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center text-muted">No recent activity</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pending Applications -->
+  <div class="dashboard-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4>Pending Applications</h4>
+      <a href="#applications" class="btn btn-msrtc-outline btn-sm" onclick="showSection('applications'); return false;">
+        View All
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-custom">
+        <thead>
+          <tr>
+            <th>Application ID</th>
+            <th>Applicant Name</th>
+            <th>Type</th>
+            <th>Submitted On</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if pending_applications %}
+            {% for app in pending_applications[:3] %}
+            <tr>
+              <td>APP-{{ app.id }}</td>
+              <td>{{ app.user_name }}</td>
+              <td>{{ app.application_type.title() }}</td>
+              <td>{{ app.submission_date.strftime('%d %b %Y, %I:%M %p') }}</td>
+              <td>
+                <button class="btn btn-sm btn-success me-1" data-bs-toggle="modal" data-bs-target="#applicationModal" 
+                        data-app-id="{{ app.id }}" onclick="loadApplicationDetails({{ app.id }})">
+                  <i class="fas fa-eye"></i> Review
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">No pending applications</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+        <!-- Applications Section -->
+        <div id="applications" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-file-alt text-primary me-2"></i> Application Management</h2>
+
+          <div class="dashboard-card">
+            <ul class="nav nav-tabs nav-tabs-custom" id="applicationTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">Approved</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">Rejected</button>
+              </li>
+            </ul>
+
+            <div class="tab-content p-3" id="applicationTabsContent">
+              <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Application ID</th>
+                        <th>Applicant Name</th>
+                        <th>Type</th>
+                        <th>Submitted On</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if verified_applications %}
+                        {% for app in verified_applications %}
+                        <tr>
+                          <td>APP-{{ app.id }}</td>
+                          <td>{{ app.user_name }}</td>
+                          <td>{{ app.application_type.title() }}</td>
+                          <td>{{ app.college_verification_date.strftime('%d %b %Y, %I:%M %p') if app.college_verification_date else 'N/A' }}</td>
+                          <td><span class="badge badge-pending">Verified by College</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-success me-1" data-bs-toggle="modal" data-bs-target="#applicationModal" 
+                                    data-app-id="{{ app.id }}" onclick="loadApplicationDetails({{ app.id }})">
+                              <i class="fas fa-eye"></i> Review
+                            </button>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted">No verified applications waiting for approval</td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="approved" role="tabpanel">
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Application ID</th>
+                        <th>Applicant Name</th>
+                        <th>Type</th>
+                        <th>Approved On</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if approved_applications %}
+                        {% for app in approved_applications %}
+                        <tr>
+                          <td>APP-{{ app.id }}</td>
+                          <td>{{ app.user_name }}</td>
+                          <td>{{ app.application_type.title() }}</td>
+                          <td>{{ app.admin_approval_date.strftime('%d %b %Y, %I:%M %p') if app.admin_approval_date else 'N/A' }}</td>
+                          <td><span class="badge badge-approved">Approved</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-info me-1" onclick="downloadPass({{ app.id }})">
+                              <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="sendPass({{ app.id }})">
+                              <i class="fas fa-envelope"></i> Send
+                            </button>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted">No approved applications</td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="rejected" role="tabpanel">
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Application ID</th>
+                        <th>Applicant Name</th>
+                        <th>Type</th>
+                        <th>Rejected On</th>
+                        <th>Reason</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if rejected_applications %}
+                        {% for app in rejected_applications %}
+                        <tr>
+                          <td>APP-{{ app.id }}</td>
+                          <td>{{ app.user_name }}</td>
+                          <td>{{ app.application_type.title() }}</td>
+                          <td>{{ app.admin_approval_date.strftime('%d %b %Y, %I:%M %p') if app.admin_approval_date else 'N/A' }}</td>
+                          <td>{{ app.admin_approval_notes or 'No reason provided' }}</td>
+                          <td>
+                            <button class="btn btn-sm btn-warning" onclick="notifyUser({{ app.id }})">
+                              <i class="fas fa-envelope"></i> Notify
+                            </button>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted">No rejected applications</td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+       <!-- Pass Management Section -->
+<div id="pass-management" class="content-section">
+  <h2 class="mb-4"><i class="fas fa-id-card text-primary me-2"></i> Pass Management</h2>
+
+  <div class="dashboard-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4>Active Passes</h4>
+      <div class="d-flex">
+        <input type="text" class="form-control me-2" placeholder="Search passes..." style="width: 250px;" id="passSearch">
+        <button class="btn btn-msrtc" onclick="filterPasses()">
+          <i class="fas fa-search me-1"></i> Search
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-custom">
+        <thead>
+          <tr>
+            <th>Pass ID</th>
+            <th>Holder Name</th>
+            <th>Type</th>
+            <th>Issue Date</th>
+            <th>Expiry Date</th>
+            <th>Route</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="passTableBody">
+          {% if passes %}
+            {% for pass in passes %}
+            <tr>
+              <td>{{ pass.pass_number }}</td>
+              <td>
+                {% for app in all_applications %}
+                  {% if app.id == pass.application_id %}
+                    {{ app.full_name }}
+                  {% endif %}
+                {% endfor %}
+              </td>
+              <td>{{ pass.pass_type }}</td>
+              <td>{{ pass.issue_date.strftime('%d %b %Y') if pass.issue_date else 'N/A' }}</td>
+              <td>{{ pass.expiry_date.strftime('%d %b %Y') if pass.expiry_date else 'N/A' }}</td>
+              <td>{{ pass.from_location }} → {{ pass.to_location }}</td>
+              <td>
+                {% if pass.status == 'active' and pass.expiry_date >= current_date %}
+                  <span class="badge badge-approved">Active</span>
+                {% elif pass.status == 'active' and pass.expiry_date < current_date %}
+                  <span class="badge badge-expired">Expired</span>
+                {% elif pass.status == 'renewed' %}
+                  <span class="badge badge-info">Renewed</span>
+                {% else %}
+                  <span class="badge badge-secondary">{{ pass.status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="viewPass({{ pass.application_id }})">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn btn-sm btn-warning me-1" onclick="printPass({{ pass.application_id }})">
+                  <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="revokePass({{ pass.id }})">
+                  <i class="fas fa-ban"></i> Revoke
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">No passes found</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div id="passCount">Showing {{ passes|length }} of {{ total_pass_count }} entries</div>
+      <nav>
+        <ul class="pagination">
+          <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="#" onclick="changePassPage({{ current_page - 1 }})">Previous</a>
+          </li>
+          {% for page in range(1, total_pages + 1) %}
+            <li class="page-item {% if page == current_page %}active{% endif %}">
+              <a class="page-link" href="#" onclick="changePassPage({{ page }})">{{ page }}</a>
+            </li>
+          {% endfor %}
+          <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="#" onclick="changePassPage({{ current_page + 1 }})">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+        <!-- Reports Section -->
+<div id="reports" class="content-section">
+  <h2 class="mb-4"><i class="fas fa-chart-bar text-primary me-2"></i> Reports & Analytics</h2>
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="dashboard-card">
+        <h4 class="mb-4">Applications Overview (Last 6 Months)</h4>
+        <canvas id="applicationsChart" height="250"></canvas>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dashboard-card">
+        <h4 class="mb-4">Pass Distribution</h4>
+        <canvas id="passDistributionChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="dashboard-card">
+        <h4 class="mb-4">Monthly Statistics</h4>
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Applications</th>
+                <th>Approved</th>
+                <th>Rejected</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if monthly_stats %}
+                {% for stat in monthly_stats %}
+                <tr>
+                  <td>{{ stat.month }}</td>
+                  <td>{{ stat.total_applications }}</td>
+                  <td>{{ stat.approved }}</td>
+                  <td>{{ stat.rejected }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted">No data available</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="dashboard-card">
+        <h4 class="mb-4">Pass Type Statistics</h4>
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>Pass Type</th>
+                <th>Active</th>
+                <th>Expired</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if pass_type_stats %}
+                {% for stat in pass_type_stats %}
+                <tr>
+                  <td>{{ stat.pass_type }}</td>
+                  <td>{{ stat.active }}</td>
+                  <td>{{ stat.expired }}</td>
+                  <td>{{ stat.total }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted">No data available</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4>Generate Custom Report</h4>
+      <button class="btn btn-msrtc" onclick="exportReport()">
+        <i class="fas fa-download me-1"></i> Export Report
+      </button>
+    </div>
+
+    <form class="row g-3" id="reportForm">
+      <div class="col-md-3">
+        <label for="reportType" class="form-label">Report Type</label>
+        <select class="form-select" id="reportType" name="reportType">
+          <option value="applications" selected>Applications Report</option>
+          <option value="pass_issuance">Pass Issuance Report</option>
+          <option value="revenue">Revenue Report</option>
+          <option value="demographics">User Demographics</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="dateFrom" class="form-label">Date From</label>
+        <input type="date" class="form-control" id="dateFrom" name="dateFrom" value="{{ default_date_from }}">
+      </div>
+      <div class="col-md-3">
+        <label for="dateTo" class="form-label">Date To</label>
+        <input type="date" class="form-control" id="dateTo" name="dateTo" value="{{ default_date_to }}">
+      </div>
+      <div class="col-md-3">
+        <label for="passType" class="form-label">Pass Type</label>
+        <select class="form-select" id="passType" name="passType">
+          <option value="all" selected>All Types</option>
+          <option value="student">Student</option>
+          <option value="worker">Worker</option>
+          <option value="senior">Senior Citizen</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <button type="button" class="btn btn-msrtc" onclick="generateReport()">
+          <i class="fas fa-chart-line me-1"></i> Generate Report
+        </button>
+      </div>
+    </form>
+
+    <div id="reportResults" class="mt-4" style="display: none;">
+      <h5 class="mb-3">Report Results</h5>
+      <div class="table-responsive">
+        <table class="table table-custom" id="resultsTable">
+          <thead>
+            <tr id="resultsHeader"></tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+        <!-- Settings Section -->
+        <div id="settings" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-cog text-primary me-2"></i> System Settings</h2>
+          <div class="dashboard-card">
+            <ul class="nav nav-tabs nav-tabs-custom" id="settingsTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">General</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fares-tab" data-bs-toggle="tab" data-bs-target="#fares" type="button" role="tab">Fare Settings</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">Notifications</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">Security</button>
+              </li>
+            </ul>
+
+            <div class="tab-content p-3" id="settingsTabsContent">
+              <div class="tab-pane fade show active" id="general" role="tabpanel">
+                <form>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="systemName" class="form-label">System Name</label>
+                      <input type="text" class="form-control" id="systemName" value="MahaPass - MSRTC Bus Pass System">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="adminEmail" class="form-label">Admin Email</label>
+                      <input type="email" class="form-control" id="adminEmail" value="admin@mahapass.msrtc.gov.in">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="pageSize" class="form-label">Records Per Page</label>
+                      <input type="number" class="form-control" id="pageSize" value="20">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="autoLogout" class="form-label">Auto Logout (minutes)</label>
+                      <input type="number" class="form-control" id="autoLogout" value="30">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-12">
+                      <label for="systemLogo" class="form-label">System Logo</label>
+                      <input type="file" class="form-control" id="systemLogo">
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="maintenanceMode" checked>
+                    <label class="form-check-label" for="maintenanceMode">Maintenance Mode</label>
+                  </div>
+                  <button type="submit" class="btn btn-msrtc">Save General Settings</button>
+                </form>
+              </div>
+
+              <div class="tab-pane fade" id="fares" role="tabpanel">
+                <form>
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <label for="studentDiscount" class="form-label">Student Discount (%)</label>
+                                           <input type="number" class="form-control" id="studentDiscount" value="50">
+                    </div>
+                    <div class="col-md-4">
+                      <label for="workerDiscount" class="form-label">Worker Discount (%)</label>
+                      <input type="number" class="form-control" id="workerDiscount" value="30">
+                    </div>
+                    <div class="col-md-4">
+                      <label for="seniorDiscount" class="form-label">Senior Citizen Discount (%)</label>
+                      <input type="number" class="form-control" id="seniorDiscount" value="40">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="baseFare" class="form-label">Base Fare (per km)</label>
+                      <input type="number" class="form-control" id="baseFare" value="2.5" step="0.1">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="minFare" class="form-label">Minimum Fare (₹)</label>
+                      <input type="number" class="form-control" id="minFare" value="10">
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="peakSurcharge" checked>
+                    <label class="form-check-label" for="peakSurcharge">Apply Peak Hour Surcharge (10%)</label>
+                  </div>
+                  <button type="submit" class="btn btn-msrtc">Save Fare Settings</button>
+                </form>
+              </div>
+
+              <div class="tab-pane fade" id="notifications" role="tabpanel">
+                <form>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                    <label class="form-check-label" for="emailNotifications">Enable Email Notifications</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="smsNotifications" checked>
+                    <label class="form-check-label" for="smsNotifications">Enable SMS Notifications</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="appNotifications" checked>
+                    <label class="form-check-label" for="appNotifications">Enable In-App Notifications</label>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="renewalReminder" class="form-label">Renewal Reminder (days before expiry)</label>
+                      <input type="number" class="form-control" id="renewalReminder" value="7">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="approvalNotification" class="form-label">Approval Notification Delay (hours)</label>
+                      <input type="number" class="form-control" id="approvalNotification" value="2">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-msrtc">Save Notification Settings</button>
+                </form>
+              </div>
+
+              <div class="tab-pane fade" id="security" role="tabpanel">
+                <form>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="passwordExpiry" class="form-label">Password Expiry (days)</label>
+                      <input type="number" class="form-control" id="passwordExpiry" value="90">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="maxLoginAttempts" class="form-label">Max Login Attempts</label>
+                      <input type="number" class="form-control" id="maxLoginAttempts" value="5">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                                        <div class="col-md-6">
+                      <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
+                      <input type="number" class="form-control" id="sessionTimeout" value="30">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="twoFactorAuth" class="form-label">Two-Factor Authentication</label>
+                      <select class="form-select" id="twoFactorAuth">
+                        <option selected>Optional</option>
+                        <option>Required for Admins</option>
+                        <option>Required for All Users</option>
+                        <option>Disabled</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="ipWhitelisting">
+                    <label class="form-check-label" for="ipWhitelisting">Enable IP Whitelisting</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auditLogging" checked>
+                    <label class="form-check-label" for="auditLogging">Enable Audit Logging</label>
+                  </div>
+                  <button type="submit" class="btn btn-msrtc">Save Security Settings</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container-fluid">
+      <div class="footer-links">
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Help Center</a>
+      </div>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+      <div class="text-center">
+        <p class="mb-0">© 2024 MahaPass - MSRTC Bus Pass System. All rights reserved.</p>
+        <p class="small">Designed and developed for Maharashtra State Road Transport Corporation</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Review Modal -->
+<div class="modal fade" id="applicationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Application Review - <span id="modalAppId"></span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Applicant Information -->
+          <div class="col-md-6">
+            <h6>Applicant Information</h6>
+            <p><strong>Name:</strong> <span id="modalAppName"></span></p>
+            <p><strong>Type:</strong> <span id="modalAppType"></span></p>
+            <p><strong>Submitted On:</strong> <span id="modalAppDate"></span></p>
+            <p><strong>Contact:</strong> <span id="modalAppContact"></span></p>
+            <p><strong>Email:</strong> <span id="modalAppEmail"></span></p>
+            <p><strong>Institution:</strong> <span id="modalAppInstitution"></span></p>
+            <p><strong>Course:</strong> <span id="modalAppCourse"></span></p>
+            <p><strong>Student ID:</strong> <span id="modalAppStudentId"></span></p>
+          </div>
+          
+          <!-- Application Details -->
+          <div class="col-md-6">
+            <h6>Application Details</h6>
+            <p><strong>Route:</strong> <span id="modalAppRoute"></span></p>
+            <p><strong>Validity Requested:</strong> <span id="modalAppValidity"></span></p>
+            <p><strong>Status:</strong> <span id="modalAppStatus" class="badge badge-pending">Pending</span></p>
+            <p><strong>College Verified By:</strong> <span id="modalAppCollegeAdmin"></span></p>
+            <p><strong>College:</strong> <span id="modalAppCollegeName"></span></p>
+            
+            <!-- Admin Stamp & Signature Upload -->
+            <div class="mt-3">
+              <h6>Admin Verification</h6>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label for="adminStamp" class="form-label small">Upload Admin Stamp</label>
+                  <input type="file" class="form-control form-control-sm" id="adminStamp" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                  <label for="adminSignature" class="form-label small">Upload Admin Signature</label>
+                  <input type="file" class="form-control form-control-sm" id="adminSignature" accept="image/*">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <!-- Documents Section -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6>Submitted Documents</h6>
+            <div class="row" id="documentPreview">
+              {% if application and application.id_proof_path %}
+                <div class="col-md-4 mb-3">
+                  <div class="card">
+                    <img src="{{ url_for('static', filename=application.id_proof_path|replace('\\', '/') ) }}" class="card-img-top" alt="ID Proof">
+                    <div class="card-body p-2">
+                      <p class="card-text small">ID Proof</p>
+                      <p class="text-muted small">Image path: {{ application.id_proof_path }}</p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              {% if application and application.signature_path %}
+                <div class="col-md-4 mb-3">
+                  <div class="card">
+                    <img src="{{ url_for('static', filename=application.signature_path|replace('\\', '/') ) }}" class="card-img-top" alt="Signature">
+                    <div class="card-body p-2">
+                      <p class="card-text small">Signature</p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              {% if application and application.stamp_path %}
+                <div class="col-md-4 mb-3">
+                  <div class="card">
+                    <img src="{{ url_for('static', filename=application.stamp_path|replace('\\', '/') ) }}" class="card-img-top" alt="Stamp">
+                    <div class="card-body p-2">
+                      <p class="card-text small">Stamp</p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <!-- Review Actions -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6>Review Actions</h6>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" onclick="approveApplication()">
+                <i class="fas fa-check me-1"></i> Approve
+              </button>
+              <button class="btn btn-danger" data-bs-toggle="collapse" data-bs-target="#rejectionReason">
+                <i class="fas fa-times me-1"></i> Reject
+              </button>
+              <button class="btn btn-warning" onclick="requestMoreInfo()">
+                <i class="fas fa-comment me-1"></i> Request More Info
+              </button>
+            </div>
+            
+            <!-- Rejection Reason Collapse -->
+            <div class="collapse mt-3" id="rejectionReason">
+              <div class="card card-body">
+                <label for="rejectionComments" class="form-label">Reason for Rejection</label>
+                <textarea class="form-control" id="rejectionComments" rows="3" 
+                          placeholder="Specify the reason for rejecting this application..."></textarea>
+                <button class="btn btn-danger mt-2 align-self-end" onclick="rejectApplication()">
+                  Confirm Rejection
+                </button>
+              </div>
+            </div>
+            
+            <!-- Additional Notes -->
+            <div class="mt-3">
+              <label for="approvalNotes" class="form-label">Additional Notes (Optional)</label>
+              <textarea class="form-control" id="approvalNotes" rows="2" 
+                        placeholder="Add any additional notes or comments..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveDraft()">Save Draft</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden form for application approval -->
+<form id="approvalForm" action="" method="POST" enctype="multipart/form-data" style="display: none;">
+  <input type="hidden" name="action" id="approvalAction">
+  <input type="hidden" name="notes" id="approvalNotes">
+  <input type="file" name="adminStamp" id="hiddenAdminStampInput">
+  <input type="file" name="adminSignature" id="hiddenAdminSignInput">
+</form>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- AOS Animation -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Section navigation
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      // Show the selected section
+      document.getElementById(sectionId).classList.add('active');
+
+      // Update menu items
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === sectionId) {
+          item.classList.add('active');
+        }
+      });
+
+      // Close sidebar on mobile after selection
+      if (window.innerWidth < 992) {
+        document.getElementById('sidebar').classList.remove('active');
+      }
+     
+    }
+
+    // Toggle sidebar on mobile
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth < 992 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) &&
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Prevent sidebar from closing when clicking inside on mobile
+    document.getElementById('sidebar').addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    // Application Modal Handler
+    const applicationModal = document.getElementById('applicationModal');
+    if (applicationModal) {
+      applicationModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const appId = button.getAttribute('data-app-id');
+        const modalTitle = applicationModal.querySelector('#modalAppId');
+        
+        // Set application ID in modal
+        modalTitle.textContent = appId;
+        
+        // Here you would typically fetch application details from your backend
+        // For demo purposes, we're using static data
+        const sampleData = {
+          'APP202405001': {
+            name: 'Rahul Sharma',
+            type: 'New Student Pass',
+            date: 'Today, 10:30 AM',
+            contact: '+91 9876543210',
+            email: 'rahul.sharma@example.com',
+            route: 'Pune - Mumbai',
+            validity: '6 Months',
+            status: 'Pending'
+          },
+          'APP202405002': {
+            name: 'Priya Patel',
+            type: 'Renewal',
+            date: 'Today, 09:15 AM',
+            contact: '+91 9765432109',
+            email: 'priya.patel@example.com',
+            route: 'Mumbai - Nashik',
+            validity: '12 Months',
+            status: 'Pending'
+          },
+          'APP202404128': {
+            name: 'Amit Kumar',
+            type: 'Worker Pass',
+            date: 'Yesterday, 03:45 PM',
+            contact: '+91 9654321098',
+            email: 'amit.kumar@example.com',
+            route: 'Nagpur - Amravati',
+            validity: '6 Months',
+            status: 'Pending'
+          }
+        };
+        
+        if (sampleData[appId]) {
+          const data = sampleData[appId];
+          document.getElementById('modalAppName').textContent = data.name;
+          document.getElementById('modalAppType').textContent = data.type;
+          document.getElementById('modalAppDate').textContent = data.date;
+          document.getElementById('modalAppContact').textContent = data.contact;
+          document.getElementById('modalAppEmail').textContent = data.email;
+          document.getElementById('modalAppRoute').textContent = data.route;
+          document.getElementById('modalAppValidity').textContent = data.validity;
+          
+          const statusBadge = document.getElementById('modalAppStatus');
+          statusBadge.textContent = data.status;
+          statusBadge.className = 'badge badge-' + data.status.toLowerCase();
+        }
+      });
+    }
+
+    // New functions for real application data
+    let currentApplicationId = null;
+    let applicationData = {};
+
+    // Store application data from server
+    {% if verified_applications %}
+      applicationData = {
+        {% for app in verified_applications %}
+        {{ app.id }}: {
+          id: {{ app.id }},
+          name: '{{ app.user_name }}',
+          type: '{{ app.application_type.title() }}',
+          date: '{{ app.college_verification_date.strftime("%d %b %Y, %I:%M %p") if app.college_verification_date else "N/A" }}',
+          contact: '{{ app.user_phone or "N/A" }}',
+          email: '{{ app.user_email or "N/A" }}',
+          route: '{{ app.from_location or "N/A" }} → {{ app.to_location or "N/A" }}',
+          validity: '{{ app.duration or "N/A" }}',
+          status: 'Verified by College',
+          institution: '{{ app.institution_name or "N/A" }}',
+          course: '{{ app.course or "N/A" }}',
+          studentId: '{{ app.student_id or "N/A" }}',
+          collegeAdmin: '{{ app.college_admin_name or "N/A" }}',
+          collegeName: '{{ app.college_name or "N/A" }}'
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      };
+    {% endif %}
+
+    // Enhanced loadApplicationDetails function
+    function loadApplicationDetails(appId) {
+      currentApplicationId = appId;
+      const data = applicationData[appId];
+      
+      if (data) {
+        // Set basic information
+        document.getElementById('modalAppId').textContent = `APP-${data.id}`;
+        document.getElementById('modalAppName').textContent = data.name;
+        document.getElementById('modalAppType').textContent = data.type;
+        document.getElementById('modalAppDate').textContent = data.date;
+        document.getElementById('modalAppContact').textContent = data.contact;
+        document.getElementById('modalAppEmail').textContent = data.email;
+        document.getElementById('modalAppRoute').textContent = data.route;
+        document.getElementById('modalAppValidity').textContent = data.validity;
+        document.getElementById('modalAppStatus').textContent = data.status;
+        document.getElementById('modalAppInstitution').textContent = data.institution;
+        document.getElementById('modalAppCourse').textContent = data.course;
+        document.getElementById('modalAppStudentId').textContent = data.studentId;
+        document.getElementById('modalAppCollegeAdmin').textContent = data.collegeAdmin;
+        document.getElementById('modalAppCollegeName').textContent = data.collegeName;
+
+        // Load documents preview
+        loadApplicationDocuments(appId);
+      }
+    }
+
+    // Function to load application documents
+    function loadApplicationDocuments(appId) {
+      const documentsContainer = document.getElementById('documentPreview');
+      documentsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p>Loading documents...</p></div>';
+
+      // Fetch application details to get document paths
+      fetch(`/admin/get_application_details/${appId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayDocuments(data.application);
+          } else {
+            documentsContainer.innerHTML = '<div class="alert alert-warning">No documents available</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading documents:', error);
+          documentsContainer.innerHTML = '<div class="alert alert-danger">Error loading documents</div>';
+        });
+    }
+
+    // Function to display documents
+    function displayDocuments(application) {
+      const documentsContainer = document.getElementById('documentPreview');
+      documentsContainer.innerHTML = '';
+
+      const documents = [
+        { 
+          name: 'ID Proof', 
+          path: application.id_proof_path,
+          type: 'id_proof'
+        },
+        { 
+          name: 'Signature', 
+          path: application.signature_path,
+          type: 'signature'
+        },
+        { 
+          name: 'College Stamp', 
+          path: application.college_stamp_path,
+          type: 'college_stamp'
+        },
+        { 
+          name: 'College Signature', 
+          path: application.college_signature_path,
+          type: 'college_signature'
+        }
+      ];
+
+      documents.forEach(doc => {
+        if (doc.path) {
+          const docCol = document.createElement('div');
+          docCol.className = 'col-md-3 mb-3';
+          
+          docCol.innerHTML = `
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <h6 class="card-title">${doc.name}</h6>
+                <img src="${doc.path}"
+                     class="img-fluid rounded border" 
+                     style="max-height: 120px; object-fit: contain;"
+                     alt="${doc.name}"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YzZjNmMyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTk5OTkiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                <div class="mt-2">
+                  <button class="btn btn-sm btn-outline-primary" onclick="viewDocument('${doc.path}')">
+                    <i class="fas fa-expand"></i> View Full
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          documentsContainer.appendChild(docCol);
+        }
+      });
+
+      if (documentsContainer.children.length === 0) {
+        documentsContainer.innerHTML = '<div class="alert alert-info">No documents submitted</div>';
+      }
+    }
+
+    // Function to view document in full screen
+    function viewDocument(documentPath) {
+      const fullUrl = documentPath.startsWith('http') ? documentPath : '/static/uploads/' + documentPath;
+      window.open(fullUrl, '_blank');
+    }
+
+    // Enhanced approveApplication function
+    function approveApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const adminStampFile = document.getElementById('adminStamp').files[0];
+      const adminSignatureFile = document.getElementById('adminSignature').files[0];
+      const notes = document.getElementById('approvalNotes').value;
+
+      if (!adminStampFile || !adminSignatureFile) {
+        alert('Please upload both admin stamp and signature before approval');
+        return;
+      }
+
+      const form = document.getElementById('approvalForm');
+      form.action = `/admin/approve_application/${currentApplicationId}`;
+      document.getElementById('approvalAction').value = 'approve';
+      document.getElementById('approvalNotes').value = notes;
+      
+      // Set files for hidden inputs
+      const dataTransfer = new DataTransfer();
+      if (adminStampFile) dataTransfer.items.add(adminStampFile);
+      document.getElementById('hiddenAdminStampInput').files = dataTransfer.files;
+
+      const dataTransfer2 = new DataTransfer();
+      if (adminSignatureFile) dataTransfer2.items.add(adminSignatureFile);
+      document.getElementById('hiddenAdminSignInput').files = dataTransfer2.files;
+      
+      form.submit();
+    }
+
+    // Enhanced rejectApplication function
+    function rejectApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const reason = document.getElementById('rejectionComments').value;
+      if (!reason.trim()) {
+        alert('Please provide a reason for rejection.');
+        return;
+      }
+
+      const adminStampFile = document.getElementById('adminStamp').files[0];
+      const adminSignatureFile = document.getElementById('adminSignature').files[0];
+
+      const form = document.getElementById('approvalForm');
+      form.action = `/admin/approve_application/${currentApplicationId}`;
+      document.getElementById('approvalAction').value = 'reject';
+      document.getElementById('approvalNotes').value = reason;
+      
+      // Set files for hidden inputs
+      const dataTransfer = new DataTransfer();
+      if (adminStampFile) dataTransfer.items.add(adminStampFile);
+      document.getElementById('hiddenAdminStampInput').files = dataTransfer.files;
+
+      const dataTransfer2 = new DataTransfer();
+      if (adminSignatureFile) dataTransfer2.items.add(adminSignatureFile);
+      document.getElementById('hiddenAdminSignInput').files = dataTransfer2.files;
+      
+      form.submit();
+    }
+
+    // Function to request more information
+    function requestMoreInfo() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const notes = document.getElementById('approvalNotes').value;
+      if (!notes.trim()) {
+        alert('Please specify what additional information is needed.');
+        return;
+      }
+
+      // Here you would typically make an API call to update the application status
+      alert(`Information request sent for application ${currentApplicationId}. Notes: ${notes}`);
+      
+      // Close the modal
+      const bsModal = bootstrap.Modal.getInstance(document.getElementById('applicationModal'));
+      bsModal.hide();
+    }
+
+    // Function to save as draft
+    function saveDraft() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const notes = document.getElementById('approvalNotes').value;
+      alert(`Draft saved for application ${currentApplicationId}`);
+      
+      // You could implement auto-save functionality here
+    }
+
+    // Override the existing functions
+    function approveApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const form = document.getElementById('approvalForm');
+      form.action = `/admin/approve_application/${currentApplicationId}`;
+      document.getElementById('approvalAction').value = 'approve';
+      document.getElementById('approvalNotes').value = 'Application approved by admin';
+      
+      form.submit();
+    }
+
+    function rejectApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const reason = document.getElementById('rejectionComments').value;
+      if (!reason.trim()) {
+        alert('Please provide a reason for rejection.');
+        return;
+      }
+
+      const form = document.getElementById('approvalForm');
+      form.action = `/admin/approve_application/${currentApplicationId}`;
+      document.getElementById('approvalAction').value = 'reject';
+      document.getElementById('approvalNotes').value = reason;
+      
+      form.submit();
+    }
+
+    // Initialize charts
+    document.addEventListener('DOMContentLoaded', function() {
+      // Applications Chart
+      const applicationsCtx = document.getElementById('applicationsChart').getContext('2d');
+      const applicationsChart = new Chart(applicationsCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Applications Received',
+            data: [120, 150, 180, 200, 240, 220],
+            backgroundColor: 'rgba(212, 0, 0, 0.7)',
+            borderColor: 'rgba(212, 0, 0, 1)',
+            borderWidth: 1
+          }, {
+            label: 'Applications Approved',
+            data: [100, 130, 160, 180, 210, 200],
+            backgroundColor: 'rgba(0, 128, 0, 0.7)',
+            borderColor: 'rgba(0, 128, 0, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Applications'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Month'
+              }
+            }
+          }
+        }
+      });
+
+      // Pass Distribution Chart
+      const passDistributionCtx = document.getElementById('passDistributionChart').getContext('2d');
+      const passDistributionChart = new Chart(passDistributionCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Student', 'Worker', 'Senior Citizen'],
+          datasets: [{
+            data: [65, 25, 10],
+            backgroundColor: [
+              'rgba(212, 0, 0, 0.8)',
+              'rgba(0, 86, 184, 0.8)',
+              'rgba(255, 165, 0, 0.8)'
+            ],
+            borderColor: [
+              'rgba(212, 0, 0, 1)',
+              'rgba(0, 86, 184, 1)',
+              'rgba(255, 165, 0, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    });
+
+    // Form submission handlers
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Student registration submitted successfully!');
+      this.reset();
+    });
+
+    document.getElementById('workerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Worker registration submitted successfully!');
+      this.reset();
+    });
+
+    document.getElementById('seniorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Senior citizen registration submitted successfully!');
+      this.reset();
+    });
+
+    // Flash message functionality
+    function closeFlashMessage(button) {
+      const message = button.parentElement;
+      message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+      setTimeout(() => {
+        message.remove();
+      }, 300);
+    }
+
+    // Show dashboard by default on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      showSection('dashboard');
+      
+      // Initialize tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      // Auto-hide flash messages after 5 seconds
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        setTimeout(() => {
+          if (message.parentElement) {
+            message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+            setTimeout(() => {
+              message.remove();
+            }, 300);
+          }
+        }, 5000);
+      });
+    });
+
+    function postForm(url) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    function sendPass(appId) {
+      postForm(`/admin/send_pass/${appId}`);
+    }
+
+    function notifyUser(appId) {
+      postForm(`/admin/notify_user/${appId}`);
+    }
+    
+    // Pass management functions
+    function viewPass(applicationId) {
+      window.open(`/user/view_pass/${applicationId}`, '_blank');
+    }
+
+    function printPass(applicationId) {
+      window.open(`/user/download_pass/${applicationId}`, '_blank');
+    }
+
+    function revokePass(passId) {
+      if (confirm('Are you sure you want to revoke this pass?')) {
+        fetch(`/admin/revoke_pass/${passId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Pass revoked successfully');
+            location.reload();
+          } else {
+            alert('Error revoking pass: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error revoking pass');
+        });
+      }
+    }
+
+    function filterPasses() {
+      const searchTerm = document.getElementById('passSearch').value.toLowerCase();
+      const rows = document.getElementById('passTableBody').getElementsByTagName('tr');
+      
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      }
+      
+      // Update count
+      const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+      document.getElementById('passCount').textContent = `Showing ${visibleRows.length} of ${rows.length} entries`;
+    }
+
+    function changePassPage(page) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', page);
+      window.location.href = url.toString();
+    }
+    
+    // Chart initialization and report functions
+    function initializeCharts() {
+        // Applications Chart
+        const applicationsCtx = document.getElementById('applicationsChart').getContext('2d');
+        const applicationsChart = new Chart(applicationsCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data|map(attribute='month_name')|list|tojson }},
+                datasets: [{
+                    label: 'Applications Received',
+                    data: {{ chart_data|map(attribute='applications_received')|list|tojson }},
+                    backgroundColor: 'rgba(212, 0, 0, 0.7)',
+                    borderColor: 'rgba(212, 0, 0, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Applications Approved',
+                    data: {{ chart_data|map(attribute='applications_approved')|list|tojson }},
+                    backgroundColor: 'rgba(0, 128, 0, 0.7)',
+                    borderColor: 'rgba(0, 128, 0, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Applications'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pass Distribution Chart
+        const passDistributionCtx = document.getElementById('passDistributionChart').getContext('2d');
+        const passDistributionChart = new Chart(passDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ pass_distribution|map(attribute='pass_type')|list|tojson }},
+                datasets: [{
+                    data: {{ pass_distribution|map(attribute='count')|list|tojson }},
+                    backgroundColor: [
+                        'rgba(212, 0, 0, 0.8)',
+                        'rgba(0, 86, 184, 0.8)',
+                        'rgba(255, 165, 0, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(212, 0, 0, 1)',
+                        'rgba(0, 86, 184, 1)',
+                        'rgba(255, 165, 0, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function generateReport() {
+        const formData = new FormData(document.getElementById('reportForm'));
+        const reportType = formData.get('reportType');
+        const dateFrom = formData.get('dateFrom');
+        const dateTo = formData.get('dateTo');
+        const passType = formData.get('passType');
+        
+        fetch('/admin/generate_report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                reportType: reportType,
+                dateFrom: dateFrom,
+                dateTo: dateTo,
+                passType: passType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayReportResults(data.results, reportType);
+            } else {
+                alert('Error generating report: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error generating report');
+        });
+    }
+
+    function displayReportResults(results, reportType) {
+        const resultsDiv = document.getElementById('reportResults');
+        const headerRow = document.getElementById('resultsHeader');
+        const body = document.getElementById('resultsBody');
+        
+        // Clear previous results
+        headerRow.innerHTML = '';
+        body.innerHTML = '';
+        
+        // Set headers based on report type
+        switch(reportType) {
+            case 'applications':
+                headerRow.innerHTML = `
+                    <th>Application ID</th>
+                    <th>Applicant Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Submitted Date</th>
+                    <th>College</th>
+                `;
+                break;
+            case 'pass_issuance':
+                headerRow.innerHTML = `
+                    <th>Pass Number</th>
+                    <th>Holder Name</th>
+                    <th>Type</th>
+                    <th>Issue Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                `;
+                break;
+            case 'revenue':
+                headerRow.innerHTML = `
+                    <th>Month</th>
+                    <th>Pass Type</th>
+                    <th>Issued Passes</th>
+                    <th>Revenue</th>
+                `;
+                break;
+            case 'demographics':
+                headerRow.innerHTML = `
+                    <th>Age Group</th>
+                    <th>Gender</th>
+                    <th>Pass Type</th>
+                    <th>Count</th>
+                `;
+                break;
+        }
+        
+        // Add data rows
+        results.forEach(row => {
+            const tr = document.createElement('tr');
+            let rowHtml = '';
+            
+            switch(reportType) {
+                case 'applications':
+                    rowHtml = `
+                        <td>APP-${row.id}</td>
+                        <td>${row.full_name}</td>
+                        <td>${row.application_type}</td>
+                        <td>${row.status}</td>
+                        <td>${new Date(row.submission_date).toLocaleDateString()}</td>
+                        <td>${row.institution_name || 'N/A'}</td>
+                    `;
+                    break;
+                case 'pass_issuance':
+                    rowHtml = `
+                        <td>${row.pass_number}</td>
+                        <td>${row.full_name}</td>
+                        <td>${row.pass_type}</td>
+                        <td>${new Date(row.issue_date).toLocaleDateString()}</td>
+                        <td>${new Date(row.expiry_date).toLocaleDateString()}</td>
+                        <td>${row.status}</td>
+                    `;
+                    break;
+                case 'revenue':
+                    rowHtml = `
+                        <td>${row.month}</td>
+                        <td>${row.pass_type}</td>
+                        <td>${row.issued_passes}</td>
+                        <td>₹${row.revenue.toLocaleString()}</td>
+                    `;
+                    break;
+                case 'demographics':
+                    rowHtml = `
+                        <td>${row.age_group}</td>
+                        <td>${row.gender || 'N/A'}</td>
+                        <td>${row.pass_type}</td>
+                        <td>${row.count}</td>
+                    `;
+                    break;
+            }
+            
+            tr.innerHTML = rowHtml;
+            body.appendChild(tr);
+        });
+        
+        resultsDiv.style.display = 'block';
+    }
+
+    function exportReport() {
+        const table = document.getElementById('resultsTable');
+        if (!table) return;
+        
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            let row = [], cols = rows[i].querySelectorAll('td, th');
+            
+            for (let j = 0; j < cols.length; j++) {
+                let text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ');
+                row.push('"' + text + '"');
+            }
+            
+            csv.push(row.join(','));
+        }
+        
+        // Download CSV file
+        const csvString = csv.join('\n');
+        const filename = 'report_' + new Date().toISOString().split('T')[0] + '.csv';
+        
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Initialize charts when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MahaPass - College Admin</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logobus1.png') }}">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --msrtc-red: #D40000;
+      --msrtc-dark-red: #8B0000;
+      --msrtc-yellow: #FFD700;
+      --msrtc-black: #222222;
+      --msrtc-light: #FFF5F5;
+      --sidebar-width: 280px;
+      --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      overflow-x: hidden;
+      color: var(--msrtc-black);
+      padding-top: 70px;
+    }
+
+    .navbar {
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red)) !important;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1030;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s ease;
+      min-height: 70px;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--msrtc-yellow);
+    }
+
+    .navbar-brand {
+      padding: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand img {
+      height: 140px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 6px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .navbar.scrolled .navbar-brand img {
+      height: 100px;
+    }
+
+    .navbar.scrolled {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000) !important;
+      min-height: 60px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-nav .nav-link {
+      color: #ffeaea !important;
+      font-weight: 500;
+      padding: 12px 18px;
+      margin: 0 5px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: var(--msrtc-yellow);
+      transition: var(--transition);
+    }
+
+    .navbar-nav .nav-link:hover:before,
+    .navbar-nav .nav-link.fw-bold:before {
+      width: 80%;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.fw-bold {
+      color: #ffffff !important;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-light {
+      color: #fff;
+      border: 2px solid #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: var(--transition);
+      border-radius: 8px;
+      padding: 8px 20px;
+    }
+
+    .btn-outline-light:hover {
+      background-color: #fff;
+      color: var(--msrtc-red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: white;
+      position: relative;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+      background: var(--msrtc-light);
+    }
+
+    .profile-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--msrtc-red), var(--msrtc-dark-red));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+    }
+
+    .sidebar-menu {
+      padding: 15px 0;
+    }
+
+    .sidebar-menu .menu-item {
+      padding: 12px 20px;
+      color: var(--msrtc-black);
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+      margin: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .sidebar-menu .menu-item:hover,
+    .sidebar-menu .menu-item.active {
+      background: var(--msrtc-light);
+      color: var(--msrtc-red);
+      border-left: 3px solid var(--msrtc-red);
+      transform: translateX(5px);
+    }
+
+    .main-content {
+      margin-left: 0;
+      padding: 25px;
+      transition: var(--transition);
+      min-height: calc(100vh - 70px);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dashboard-layout {
+      display: flex;
+      min-height: calc(100vh - 70px - 90px);
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .content-section { display: none; }
+    .content-section.active { display: block; }
+
+    .footer {
+      background: linear-gradient(145deg, var(--msrtc-dark-red), #700000);
+      color: white;
+      padding: 30px 0;
+      margin-left: 0;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .app-preview {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #fff;
+    }
+
+    .stamp-overlay, .sign-overlay {
+      position: absolute;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .stamp-overlay { bottom: 16px; right: 16px; width: 120px; }
+    .sign-overlay { bottom: 16px; left: 16px; width: 160px; }
+
+    .table-custom thead th { background: var(--msrtc-red); color: #fff; border: none; }
+
+    @media (max-width: 992px) {
+      .sidebar { width: 100%; border-bottom: 1px solid #eee; }
+      .dashboard-layout { flex-direction: column; }
+    }
+
+    /* Flash Messages */
+    .flash-messages {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1050;
+      max-width: 400px;
+    }
+
+    .flash-message {
+      margin-bottom: 10px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideInRight 0.5s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flash-message.success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+
+    .flash-message.danger {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+
+    .flash-message.info {
+      background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .flash-message.warning {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+
+    .flash-message .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .flash-message .close-btn:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Flash Messages -->
+  <div class="flash-messages" id="flashMessages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="closeFlashMessage(this)">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/logobus1.png') }}" alt="Smart Bus Pass Logo" />
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="#">College Admin Dashboard</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="d-flex">
+        <a class="btn btn-outline-light" href="{{ url_for('logout') }}">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout d-flex">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="profile-icon"><i class="fas fa-user-tie"></i></div>
+        <h5 class="text-center mt-2">{{ college.name or 'College Admin' }}</h5>
+        <p class="text-muted text-center small">{{ college.code or 'CODE-000' }}</p>
+      </div>
+      <div class="sidebar-menu">
+        <a href="#pending" class="menu-item active" data-section="pending" onclick="showSection('pending'); return false;"><i class="fas fa-inbox"></i>&nbsp; Pending Applications</a>
+        <a href="#verified" class="menu-item" data-section="verified" onclick="showSection('verified'); return false;"><i class="fas fa-check-circle"></i>&nbsp; Verified Records</a>
+        <a href="#rejected" class="menu-item" data-section="rejected" onclick="showSection('rejected'); return false;"><i class="fas fa-times-circle"></i>&nbsp; Rejected Records</a>
+        <a href="#settings" class="menu-item" data-section="settings" onclick="showSection('settings'); return false;"><i class="fas fa-cog"></i>&nbsp; Settings</a>
+      </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+      <div class="container-fluid">
+        <div id="pending" class="content-section active">
+          <h2 class="mb-4"><i class="fas fa-inbox text-primary me-2"></i> Pending Applications</h2>
+          <div class="dashboard-card">
+            <div class="table-responsive">
+              <table class="table table-custom align-middle">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Submitted On</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingTableBody">
+                  {% if pending_applications %}
+                    {% for app in pending_applications %}
+                    <tr>
+                      <td>APP-{{ app.id }}</td>
+                      <td>{{ app.user_name }}</td>
+                      <td>{{ app.course or 'N/A' }}</td>
+                      <td>{{ app.submission_date.strftime('%d %b %Y') if app.submission_date else 'N/A' }}</td>
+                      <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#verifyModal" 
+                                data-app-id="{{ app.id }}" onclick="loadApplicationDetails({{ app.id }})">
+                          <i class="fas fa-eye me-1"></i> Review
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">No pending applications</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="verified" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-check-circle text-success me-2"></i> Verified Records</h2>
+          <div class="dashboard-card">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Student</th>
+                    <th>Verified On</th>
+                    <th>Stamp</th>
+                    <th>Signature</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="verifiedTableBody">
+                  {% if verified_applications %}
+                    {% for app in verified_applications %}
+                    <tr>
+                      <td>APP-{{ app.id }}</td>
+                      <td>{{ app.user_name }}</td>
+                      <td>{{ app.college_verification_date.strftime('%d %b %Y') if app.college_verification_date else 'N/A' }}</td>
+                      <td>
+                        {% if app.college_stamp_path %}
+                          <i class="fas fa-check text-success"></i> Uploaded
+                        {% else %}
+                          <i class="fas fa-times text-danger"></i> Not uploaded
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if app.college_signature_path %}
+                          <i class="fas fa-check text-success"></i> Uploaded
+                        {% else %}
+                          <i class="fas fa-times text-danger"></i> Not uploaded
+                        {% endif %}
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#verifyModal"
+                                onclick="viewApplication({{ app.id }})">
+                          <i class="fas fa-eye me-1"></i> View
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="6" class="text-center text-muted">No verified applications</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="rejected" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-times-circle text-danger me-2"></i> Rejected Records</h2>
+          <div class="dashboard-card">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Student</th>
+                    <th>Rejected On</th>
+                    <th>Reason</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rejectedTableBody">
+                  {% if rejected_applications %}
+                    {% for app in rejected_applications %}
+                    <tr>
+                      <td>APP-{{ app.id }}</td>
+                      <td>{{ app.user_name }}</td>
+                      <td>{{ app.college_verification_date.strftime('%d %b %Y') if app.college_verification_date else 'N/A' }}</td>
+                      <td>{{ app.college_verification_notes or 'No reason provided' }}</td>
+                      <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#verifyModal"
+                                onclick="viewApplication({{ app.id }})">
+                          <i class="fas fa-eye me-1"></i> View
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">No rejected applications</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="settings" class="content-section">
+          <h2 class="mb-4"><i class="fas fa-cog text-primary me-2"></i> Settings</h2>
+          <div class="dashboard-card">
+            <form class="row g-3" action="{{ url_for('college_update_settings') }}" method="POST" enctype="multipart/form-data">
+              <div class="col-md-6">
+                <label class="form-label">College Name</label>
+                <input type="text" class="form-control" name="college_name" value="{{ college.name or '' }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">College Code</label>
+                <input type="text" class="form-control" name="college_code" value="{{ college.code or '' }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Default Stamp (PNG)</label>
+                <input type="file" accept="image/png" class="form-control" id="defaultStampInput" name="defaultStamp">
+                {% if session.get('college_admin_id') %}
+                  {% set _ = None %}
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Default Signature (PNG)</label>
+                <input type="file" accept="image/png" class="form-control" id="defaultSignInput" name="defaultSign">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-msrtc btn-danger"><i class="fas fa-save me-1"></i> Save Settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container-fluid text-center">
+      <p class="mb-0">© 2024 MahaPass - MSRTC Bus Pass System</p>
+    </div>
+  </footer>
+
+  <div class="modal fade" id="verifyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Verify Application - <span id="vmAppId"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-lg-7">
+              <div class="app-preview p-3" id="appPreview">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <h5 class="text-danger mb-1">Student Pass Application</h5>
+                    <small class="text-muted">Student: <span id="vmStudentName">-</span></small>
+                  </div>
+                  <div><small class="text-muted">Submitted: <span id="vmSubmitted">-</span></small></div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-6">
+                    <p class="mb-1"><strong>Course:</strong> <span id="vmCourse">-</span></p>
+                    <p class="mb-1"><strong>Route:</strong> <span id="vmRoute">-</span></p>
+                  </div>
+                  <div class="col-6">
+                    <p class="mb-1"><strong>Institute:</strong> <span id="vmInstitute">-</span></p>
+                    <p class="mb-1"><strong>Student ID:</strong> <span id="vmStudentId">-</span></p>
+                  </div>
+                </div>
+                <img id="stampOverlay" class="stamp-overlay d-none" alt="Stamp" />
+                <img id="signOverlay" class="sign-overlay d-none" alt="Sign" />
+              </div>
+              <div class="form-text mt-2">Stamp and Signature will be overlaid on the application preview.</div>
+            </div>
+            <div class="col-lg-5">
+              <div class="card">
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Verification Decision</label>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-success flex-fill" type="button" onclick="verifyApplication()"><i class="fas fa-check me-1"></i> Verify</button>
+                      <button class="btn btn-danger flex-fill" type="button" onclick="rejectApplication()"><i class="fas fa-times me-1"></i> Reject</button>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Upload College Stamp (PNG with transparent background)</label>
+                    <input type="file" accept="image/png" class="form-control" id="stampInput">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Upload Authorized Signature (PNG)</label>
+                    <input type="file" accept="image/png" class="form-control" id="signInput">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Remarks (optional)</label>
+                    <textarea class="form-control" rows="3" id="vmRemarks" placeholder="Any notes about verification..."></textarea>
+                  </div>
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    On Verify, record will be saved with stamp & signature and returned to user.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" onclick="rejectApplication()">Reject</button>
+          <button type="button" class="btn btn-success" onclick="verifyApplication()">Verify & Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden form for application verification -->
+  <form id="verificationForm" action="" method="POST" enctype="multipart/form-data" style="display: none;">
+    <input type="hidden" name="action" id="verificationAction">
+    <input type="hidden" name="notes" id="verificationNotes">
+    <input type="file" name="collegeStamp" id="hiddenStampInput">
+    <input type="file" name="collegeSignature" id="hiddenSignInput">
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(i => {
+        i.classList.toggle('active', i.getAttribute('data-section') === sectionId);
+      });
+    }
+
+    let currentApplicationId = null;
+    let applicationData = {};
+
+    // Store application data from server
+    {% if pending_applications %}
+      applicationData = {
+        {% for app in pending_applications %}
+        {{ app.id }}: {
+          id: {{ app.id }},
+          name: '{{ app.user_name }}',
+          submitted: '{{ app.submission_date.strftime("%d %b %Y") if app.submission_date else "N/A" }}',
+          course: '{{ app.course or "N/A" }}',
+          route: '{{ app.from_location or "N/A" }} → {{ app.to_location or "N/A" }}',
+          institute: '{{ app.institution_name or "N/A" }}',
+          studentId: '{{ app.student_id or "N/A" }}',
+          email: '{{ app.user_email or "N/A" }}',
+          phone: '{{ app.user_phone or "N/A" }}',
+          address: '{{ app.address or "N/A" }}',
+          passType: '{{ app.pass_type or "N/A" }}',
+          duration: '{{ app.duration or "N/A" }}'
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      };
+    {% endif %}
+
+    function loadApplicationDetails(appId) {
+      currentApplicationId = appId;
+      const data = applicationData[appId];
+      if (data) {
+        document.getElementById('vmAppId').textContent = `APP-${data.id}`;
+        document.getElementById('vmStudentName').textContent = data.name;
+        document.getElementById('vmSubmitted').textContent = data.submitted;
+        document.getElementById('vmCourse').textContent = data.course;
+        document.getElementById('vmRoute').textContent = data.route;
+        document.getElementById('vmInstitute').textContent = data.institute;
+        document.getElementById('vmStudentId').textContent = data.studentId;
+      }
+    }
+
+    async function viewApplication(appId) {
+      try {
+        const res = await fetch(`/college/application/${appId}/details`, { credentials: 'same-origin' });
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        currentApplicationId = appId;
+        document.getElementById('vmAppId').textContent = `APP-${data.id}`;
+        document.getElementById('vmStudentName').textContent = data.name || '-';
+        document.getElementById('vmSubmitted').textContent = data.submitted || '-';
+        document.getElementById('vmCourse').textContent = data.course || '-';
+        document.getElementById('vmRoute').textContent = data.route || '-';
+        document.getElementById('vmInstitute').textContent = data.institute || '-';
+        document.getElementById('vmStudentId').textContent = data.studentId || '-';
+        document.getElementById('vmRemarks').value = data.notes || '';
+
+        // Show overlays if available
+        const stampOverlay = document.getElementById('stampOverlay');
+        const signOverlay = document.getElementById('signOverlay');
+        if (data.stampUrl) {
+          stampOverlay.src = data.stampUrl;
+          stampOverlay.classList.remove('d-none');
+        } else {
+          stampOverlay.classList.add('d-none');
+        }
+        if (data.signUrl) {
+          signOverlay.src = data.signUrl;
+          signOverlay.classList.remove('d-none');
+        } else {
+          signOverlay.classList.add('d-none');
+        }
+
+        // Disable editing in view-only mode
+        document.getElementById('stampInput').disabled = true;
+        document.getElementById('signInput').disabled = true;
+        document.getElementById('vmRemarks').readOnly = true;
+        // Hide action buttons in view mode
+        document.querySelector('.modal-footer .btn.btn-success').classList.add('d-none');
+        document.querySelector('.modal-footer .btn.btn-danger').classList.add('d-none');
+        // Also hide decision controls
+        document.querySelector('.card-body .d-flex.gap-2').parentElement.classList.add('d-none');
+      } catch (e) {
+        alert('Unable to load application details.');
+      }
+    }
+
+    const verifyModal = document.getElementById('verifyModal');
+    verifyModal.addEventListener('show.bs.modal', (ev) => {
+      // Reset form and re-enable in case previous view disabled it
+      document.getElementById('stampInput').value = '';
+      document.getElementById('signInput').value = '';
+      document.getElementById('vmRemarks').value = '';
+      document.getElementById('stampOverlay').classList.add('d-none');
+      document.getElementById('signOverlay').classList.add('d-none');
+      document.getElementById('stampInput').disabled = false;
+      document.getElementById('signInput').disabled = false;
+      document.getElementById('vmRemarks').readOnly = false;
+      // Show action buttons for pending modal unless view mode hides them later
+      document.querySelector('.modal-footer .btn.btn-success').classList.remove('d-none');
+      document.querySelector('.modal-footer .btn.btn-danger').classList.remove('d-none');
+      // Show decision controls by default
+      const decisionContainer = document.querySelector('.card-body .d-flex.gap-2').parentElement;
+      decisionContainer.classList.remove('d-none');
+    });
+
+    document.getElementById('stampInput').addEventListener('change', function () {
+      const file = this.files?.[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const img = document.getElementById('stampOverlay');
+      img.src = url;
+      img.classList.remove('d-none');
+    });
+
+    document.getElementById('signInput').addEventListener('change', function () {
+      const file = this.files?.[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const img = document.getElementById('signOverlay');
+      img.src = url;
+      img.classList.remove('d-none');
+    });
+
+    // Removed demo-only handlers that bypassed backend submission
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function () {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Flash message functionality
+    function closeFlashMessage(button) {
+      const message = button.parentElement;
+      message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+      setTimeout(() => {
+        message.remove();
+      }, 300);
+    }
+
+    function verifyApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const form = document.getElementById('verificationForm');
+      form.action = `/college/verify_application/${currentApplicationId}`;
+      document.getElementById('verificationAction').value = 'verify';
+      document.getElementById('verificationNotes').value = document.getElementById('vmRemarks').value;
+      
+      // Copy files to hidden inputs
+      const stampFile = document.getElementById('stampInput').files[0];
+      const signFile = document.getElementById('signInput').files[0];
+      
+      if (stampFile) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(stampFile);
+        document.getElementById('hiddenStampInput').files = dataTransfer.files;
+      }
+      
+      if (signFile) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(signFile);
+        document.getElementById('hiddenSignInput').files = dataTransfer.files;
+      }
+      
+      form.submit();
+    }
+
+    function rejectApplication() {
+      if (!currentApplicationId) {
+        alert('No application selected');
+        return;
+      }
+
+      const reason = prompt('Please provide a reason for rejection:');
+      if (!reason) return;
+
+      const form = document.getElementById('verificationForm');
+      form.action = `/college/verify_application/${currentApplicationId}`;
+      document.getElementById('verificationAction').value = 'reject';
+      document.getElementById('verificationNotes').value = reason;
+      
+      form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+          e.preventDefault();
+          const sectionId = this.getAttribute('data-section');
+          if (sectionId) showSection(sectionId);
+        });
+      });
+
+      // Auto-hide flash messages after 5 seconds
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        setTimeout(() => {
+          if (message.parentElement) {
+            message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+            setTimeout(() => {
+              message.remove();
+            }, 300);
+          }
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+
+</html>
+
+

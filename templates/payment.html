@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MahaPass - Payment</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logobus1.png') }}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --msrtc-red: #D40000;
+            --msrtc-dark-red: #8B0000;
+            --msrtc-yellow: #FFD700;
+            --msrtc-black: #222222;
+            --msrtc-light: #FFF5F5;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .payment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, var(--msrtc-red), var(--msrtc-dark-red));
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .payment-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .payment-body {
+            padding: 40px;
+        }
+
+        .order-summary {
+            background: var(--msrtc-light);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--msrtc-red);
+        }
+
+        .payment-method {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: var(--msrtc-red);
+            background: var(--msrtc-light);
+        }
+
+        .payment-method.active {
+            border-color: var(--msrtc-red);
+            background: var(--msrtc-light);
+        }
+
+        .payment-method input[type="radio"] {
+            display: none;
+        }
+
+        .payment-details {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .payment-details.active {
+            display: block;
+        }
+
+        .btn-pay {
+            background: var(--msrtc-red);
+            color: white;
+            font-weight: 600;
+            padding: 15px 40px;
+            border-radius: 8px;
+            border: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-pay:hover {
+            background: var(--msrtc-dark-red);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 0, 0, 0.3);
+        }
+
+        .btn-pay:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .security-info {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .amount-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--msrtc-red);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .payment-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: var(--msrtc-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash Messages -->
+    <div class="flash-messages" id="flashMessages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <div class="payment-container">
+            <!-- Payment Header -->
+            <div class="payment-header">
+                <div class="payment-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h2>Complete Your Payment</h2>
+                <p class="mb-0">Secure payment for your bus pass application</p>
+            </div>
+
+            <!-- Payment Body -->
+            <div class="payment-body">
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h4 class="mb-3"><i class="fas fa-receipt me-2"></i>Order Summary</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Pass Type:</strong> {{ pass_details.pass_type|title }}</p>
+                            <p><strong>Duration:</strong> {{ pass_details.duration|replace('-', ' ')|title }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Route:</strong> {{ pass_details.from_location|title }} to {{ pass_details.to_location|title }}</p>
+                            <p><strong>Application ID:</strong> #{{ application_id }}</p>
+                        </div>
+                    </div>
+                    {% if pass_details.distance_km %}
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <div class="d-flex flex-wrap gap-4 small">
+                                <div><strong>Distance:</strong> {{ pass_details.distance_km }} km</div>
+                                <div><strong>Normal/Trip:</strong> ₹{{ pass_details.normal_per_trip }}</div>
+                                <div><strong>Student/Trip:</strong> ₹{{ pass_details.student_per_trip }}</div>
+                                <div><strong>Student Monthly (60 trips):</strong> ₹{{ pass_details.student_monthly }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <hr>
+                    <div class="amount-display">
+                        ₹{{ "%.2f"|format(amount) }}
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <form id="paymentForm">
+                    <h4 class="mb-4"><i class="fas fa-payment me-2"></i>Select Payment Method</h4>
+
+                    <!-- Credit/Debit Card -->
+                    <div class="payment-method" onclick="selectPaymentMethod('card')">
+                        <input type="radio" name="payment_method" value="card" id="card">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Credit/Debit Card</h5>
+                                <small class="text-muted">Visa, Mastercard, RuPay accepted</small>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-details" id="card-details">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" name="card_name" placeholder="John Doe">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Expiry Month</label>
+                                    <select class="form-select" name="expiry_month">
+                                        <option value="">MM</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Expiry Year</label>
+                                    <select class="form-select" name="expiry_year">
+                                        <option value="">YYYY</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">CVV</label>
+                                    <input type="password" class="form-control" name="cvv" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UPI -->
+                    <div class="payment-method" onclick="selectPaymentMethod('upi')">
+                        <input type="radio" name="payment_method" value="upi" id="upi">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-mobile-alt fa-2x text-success me-3"></i>
+                            <div>
+                                <h5 class="mb-1">UPI Payment</h5>
+                                <small class="text-muted">Pay using Google Pay, PhonePe, Paytm</small>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-details" id="upi-details">
+                            <div class="mb-3">
+                                <label class="form-label">UPI ID</label>
+                                <input type="text" class="form-control" name="upi_id" placeholder="yourname@upi">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Banking -->
+                    <div class="payment-method" onclick="selectPaymentMethod('netbanking')">
+                        <input type="radio" name="payment_method" value="netbanking" id="netbanking">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-university fa-2x text-info me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Net Banking</h5>
+                                <small class="text-muted">All major banks supported</small>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-details" id="netbanking-details">
+                            <div class="mb-3">
+                                <label class="form-label">Select Bank</label>
+                                <select class="form-select" name="bank">
+                                    <option value="">Choose your bank</option>
+                                    <option value="sbi">State Bank of India</option>
+                                    <option value="hdfc">HDFC Bank</option>
+                                    <option value="icici">ICICI Bank</option>
+                                    <option value="axis">Axis Bank</option>
+                                    <option value="pnb">Punjab National Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Processing...</span>
+                        </div>
+                        <p class="mt-2">Processing your payment...</p>
+                    </div>
+
+                    <!-- Pay Button -->
+                    <button type="submit" class="btn-pay" id="payButton" disabled>
+                        <i class="fas fa-lock me-2"></i>Pay ₹{{ "%.2f"|format(amount) }}
+                    </button>
+
+                    <!-- Security Info -->
+                    <div class="security-info">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            <small>Your payment information is encrypted and secure. We do not store your card details.</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let selectedPaymentMethod = null;
+
+        function selectPaymentMethod(method) {
+            // Remove active class from all methods
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Hide all payment details
+            document.querySelectorAll('.payment-details').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Activate selected method
+            document.querySelector(`input[value="${method}"]`).checked = true;
+            document.querySelector(`input[value="${method}"]`).closest('.payment-method').classList.add('active');
+            document.getElementById(`${method}-details`).classList.add('active');
+            
+            selectedPaymentMethod = method;
+            document.getElementById('payButton').disabled = false;
+        }
+
+        // Card number formatting
+        document.querySelector('input[name="card_number"]')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            if (formattedValue.length <= 19) {
+                e.target.value = formattedValue;
+            }
+        });
+
+        // Form submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('payButton').disabled = true;
+
+            // Collect form data
+            const formData = new FormData(this);
+            
+            // Process payment
+            fetch('/process_payment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                if (data.success) {
+                    // Show success message
+                    alert(`Payment successful! Transaction ID: ${data.transaction_id}\n\n${data.message}`);
+                    // Redirect to dashboard
+                    window.location.href = '/user_dashboard';
+                } else {
+                    // Show error message
+                    alert(`Payment failed: ${data.message}`);
+                    document.getElementById('payButton').disabled = false;
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('payButton').disabled = false;
+                alert('An error occurred while processing payment. Please try again.');
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
