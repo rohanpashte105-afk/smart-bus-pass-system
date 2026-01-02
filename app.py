@@ -51,10 +51,10 @@ def after_request(response):
 
 # MySQL database configuration
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '123456',
-    'database': 'bus_pass_system'
+    'host': 'RohanPashte.mysql.pythonanywhere-services.com',
+    'user': 'RohanPashte',
+    'password': '7666399007RohanPashte',
+    'database': 'RohanPashte$bus_pass_system'
 }
 
 # Database connection helper
@@ -69,11 +69,7 @@ def get_db_connection():
 
 # Database initialization
 def init_db():
-    conn = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='123456'
-    )
+    conn = mysql.connector.connect(**db_config)
     
     if conn is None:
         print("❌ Failed to connect to database for initialization")
@@ -82,8 +78,7 @@ def init_db():
     cursor = conn.cursor(dictionary=True)
     
     try:
-        cursor.execute("CREATE DATABASE IF NOT EXISTS bus_pass_system")
-        cursor.execute("USE bus_pass_system")
+        # On PythonAnywhere, the database must already exist and is selected via the connection's database parameter
         
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
