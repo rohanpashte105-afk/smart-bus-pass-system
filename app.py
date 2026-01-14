@@ -12,7 +12,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 # File upload configuration
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = '/home/RohanPashte/smart-bus-pass-system/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -755,7 +755,7 @@ def submit_application():
             signature_file = request.files['signature']
             if signature_file and signature_file.filename and allowed_file(signature_file.filename):
                 filename = secure_filename(f"{session['user_id']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_signature_{signature_file.filename}")
-                signature_path = os.path.join('applications', filename)
+                signature_path = os.path.join('signatures', filename)
                 signature_file.save(os.path.join(app.config['UPLOAD_FOLDER'], signature_path))
         
         if 'profilePhoto' in request.files:
@@ -1423,7 +1423,7 @@ def renew_pass():
             signature_file = request.files['signature']
             if signature_file and signature_file.filename and allowed_file(signature_file.filename):
                 filename = secure_filename(f"{session['user_id']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_signature_{signature_file.filename}")
-                signature_path = os.path.join('applications', filename)
+                signature_path = os.path.join('signatures', filename)
                 signature_file.save(os.path.join(app.config['UPLOAD_FOLDER'], signature_path))
         
         # Calculate new expiry date based on duration
